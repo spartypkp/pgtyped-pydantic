@@ -12,3 +12,4 @@ packages/**/*.js.map
 
 .vercel
 config.json
+/env

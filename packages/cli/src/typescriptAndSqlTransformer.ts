@@ -5,6 +5,8 @@ import { ParsedConfig, TransformConfig } from './config.js';
 import { TransformJob, WorkerPool } from './index.js';
 import { debug } from './util.js';
 import { processFileFnResult } from './worker.js';
+import { writeSqlQueries } from './pythonReader';
+import { write } from 'fs';
 
 // tslint:disable:no-console
 
@@ -65,9 +67,25 @@ export class TypescriptAndSqlTransformer {
     return this.fileOverrideUsed;
   }
 
+  
+
   private async processFile(fileName: string) {
     fileName = path.relative(process.cwd(), fileName);
     console.log(`Processing ${fileName}`);
+    if (path.extname(fileName) === '.py') {
+      // If "_" in file name, return
+      if (fileName.includes('_')) {
+        return;
+      }
+      
+      let tsFilePath = await writeSqlQueries(fileName);
+      return this.processTsFile(tsFilePath);
+      
+    }
+    return this.processTsFile(fileName);
+  }
+
+  private async processTsFile(fileName: string) {
     const result = (await this.pool.run(
       {
         fileName,
@@ -75,7 +93,7 @@ export class TypescriptAndSqlTransformer {
       },
       'processFile',
     )) as Awaited<processFileFnResult>;
-
+  
     if ('skipped' in result && result.skipped) {
       console.log(`Skipped ${fileName}: no changes or no queries detected`);
     } else if ('error' in result) {
