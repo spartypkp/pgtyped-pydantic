@@ -1,13 +1,24 @@
 /** Types generated for queries found in "src/comments/comments.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-/** Query 'GetAllComments' is invalid, so its result is assigned type 'never'.
- *  */
-export type IGetAllCommentsResult = never;
+/** 'GetAllComments' parameters type */
+export interface IGetAllCommentsParams {
+  id: number;
+}
 
-/** Query 'GetAllComments' is invalid, so its parameters are assigned type 'never'.
- *  */
-export type IGetAllCommentsParams = never;
+/** 'GetAllComments' return type */
+export interface IGetAllCommentsResult {
+  body: string | null;
+  book_id: number | null;
+  id: number;
+  user_id: number | null;
+}
+
+/** 'GetAllComments' query type */
+export interface IGetAllCommentsQuery {
+  params: IGetAllCommentsParams;
+  result: IGetAllCommentsResult;
+}
 
 const getAllCommentsIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":39,"b":42},{"a":57,"b":59}]}],"statement":"SELECT * FROM book_comments WHERE id = :id! OR user_id = :id                                      "};
 
@@ -20,13 +31,24 @@ const getAllCommentsIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id"
 export const getAllComments = new PreparedQuery<IGetAllCommentsParams,IGetAllCommentsResult>(getAllCommentsIR);
 
 
-/** Query 'GetAllCommentsByIds' is invalid, so its result is assigned type 'never'.
- *  */
-export type IGetAllCommentsByIdsResult = never;
+/** 'GetAllCommentsByIds' parameters type */
+export interface IGetAllCommentsByIdsParams {
+  ids: readonly (number)[];
+}
 
-/** Query 'GetAllCommentsByIds' is invalid, so its parameters are assigned type 'never'.
- *  */
-export type IGetAllCommentsByIdsParams = never;
+/** 'GetAllCommentsByIds' return type */
+export interface IGetAllCommentsByIdsResult {
+  body: string | null;
+  book_id: number | null;
+  id: number;
+  user_id: number | null;
+}
+
+/** 'GetAllCommentsByIds' query type */
+export interface IGetAllCommentsByIdsQuery {
+  params: IGetAllCommentsByIdsParams;
+  result: IGetAllCommentsByIdsResult;
+}
 
 const getAllCommentsByIdsIR: any = {"usedParamSet":{"ids":true},"params":[{"name":"ids","required":true,"transform":{"type":"array_spread"},"locs":[{"a":40,"b":43},{"a":55,"b":59}]}],"statement":"SELECT * FROM book_comments WHERE id in :ids AND id in :ids!"};
 
@@ -39,13 +61,27 @@ const getAllCommentsByIdsIR: any = {"usedParamSet":{"ids":true},"params":[{"name
 export const getAllCommentsByIds = new PreparedQuery<IGetAllCommentsByIdsParams,IGetAllCommentsByIdsResult>(getAllCommentsByIdsIR);
 
 
-/** Query 'InsertComment' is invalid, so its result is assigned type 'never'.
- *  */
-export type IInsertCommentResult = never;
+/** 'InsertComment' parameters type */
+export interface IInsertCommentParams {
+  comments: readonly ({
+    userId: number,
+    commentBody: string
+  })[];
+}
 
-/** Query 'InsertComment' is invalid, so its parameters are assigned type 'never'.
- *  */
-export type IInsertCommentParams = never;
+/** 'InsertComment' return type */
+export interface IInsertCommentResult {
+  body: string | null;
+  book_id: number | null;
+  id: number;
+  user_id: number | null;
+}
+
+/** 'InsertComment' query type */
+export interface IInsertCommentQuery {
+  params: IInsertCommentParams;
+  result: IInsertCommentResult;
+}
 
 const insertCommentIR: any = {"usedParamSet":{"comments":true},"params":[{"name":"comments","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"userId","required":true},{"name":"commentBody","required":true}]},"locs":[{"a":73,"b":81}]}],"statement":"INSERT INTO book_comments (user_id, body)\n-- NOTE: this is a note\nVALUES :comments RETURNING *"};
 

@@ -11,3 +11,4 @@ packages/**/*.js.map
 *.log
 
 .vercel
+config.json

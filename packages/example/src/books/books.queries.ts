@@ -1,29 +1,13 @@
 /** Types generated for queries found in "src/books/books.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-import type { Category } from '../customTypes.js';
+/** Query 'FindBookById' is invalid, so its result is assigned type 'never'.
+ *  */
+export type IFindBookByIdResult = never;
 
-export type categoryArray = (Category)[];
-
-/** 'FindBookById' parameters type */
-export interface IFindBookByIdParams {
-  id?: number | null | void;
-}
-
-/** 'FindBookById' return type */
-export interface IFindBookByIdResult {
-  author_id: number | null;
-  categories: categoryArray | null;
-  id: number;
-  name: string | null;
-  rank: number | null;
-}
-
-/** 'FindBookById' query type */
-export interface IFindBookByIdQuery {
-  params: IFindBookByIdParams;
-  result: IFindBookByIdResult;
-}
+/** Query 'FindBookById' is invalid, so its parameters are assigned type 'never'.
+ *  */
+export type IFindBookByIdParams = never;
 
 const findBookByIdIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":31,"b":33}]}],"statement":"SELECT * FROM books WHERE id = :id"};
 
@@ -36,23 +20,13 @@ const findBookByIdIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","
 export const findBookById = new PreparedQuery<IFindBookByIdParams,IFindBookByIdResult>(findBookByIdIR);
 
 
-/** 'FindAllBooks' parameters type */
-export type IFindAllBooksParams = void;
+/** Query 'FindAllBooks' is invalid, so its result is assigned type 'never'.
+ *  */
+export type IFindAllBooksResult = never;
 
-/** 'FindAllBooks' return type */
-export interface IFindAllBooksResult {
-  author_id: number | null;
-  categories: categoryArray | null;
-  id: number;
-  name: string | null;
-  rank: number | null;
-}
-
-/** 'FindAllBooks' query type */
-export interface IFindAllBooksQuery {
-  params: IFindAllBooksParams;
-  result: IFindAllBooksResult;
-}
+/** Query 'FindAllBooks' is invalid, so its parameters are assigned type 'never'.
+ *  */
+export type IFindAllBooksParams = never;
 
 const findAllBooksIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT * FROM books WHERE id is not null"};
 

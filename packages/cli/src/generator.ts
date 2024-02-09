@@ -39,7 +39,7 @@ ${contents}
 \n\n`;
 
 export function escapeComment(comment: string) {
-  return comment.replace(/\*\//g, '*\\/');
+  return comment.replace(/\*\//g, '#');
 }
 
 /** Escape a key if it isn't an identifier literal */
@@ -60,9 +60,9 @@ export const generateModel = (modelName: string, fields: IField[]) => {
       if (comment) {
         lines.push(`  # ${escapeComment(comment)} `);
       }
-      console.log("Test!")
+      
       const paramSuffix = optional ? ' = None' : '';
-      const entryLine = `  ${escapeKey(fieldName)}${paramSuffix}: ${fieldType},`;
+      const entryLine = `  ${escapeKey(fieldName)}${paramSuffix}: ${fieldType}`;
       lines.push(entryLine);
       return lines.join('\n');
     })
@@ -216,7 +216,7 @@ export async function queryToPydanticDeclarations(
             : `    ${p.name}: Optional[${paramType}]`;
         })
         .join(',\n');
-      fieldType = `{\n${fieldType}\n  }`;
+      fieldType = `\n${fieldType}\n  `;
       if (isArray) {
         fieldType = `List[${fieldType}]`;
       }
@@ -308,7 +308,7 @@ export async function generateTypedecsFromFile(
   config: ParsedConfig,
 ): Promise<TypeDeclarationSet> {
   const typedQueries: TypedQuery[] = [];
-  const interfacePrefix = config.hungarianNotation ? 'I' : '';
+  const interfacePrefix = ''; // Actually wtf even is Hungarian notation?
   const typeSource: TypeSource = (query) => getTypes(query, connection);
 
   const { queries, events } =
@@ -392,11 +392,11 @@ export function generateDeclarations(typedQueries: TypedQuery[]): string {
     }
     const queryPP = typedQuery.query.ast.statement.body
       .split('\n')
-      .map((s: string) => ' * ' + s)
+      .map((s: string) => ' # ' + s)
       .join('\n');
     pydanticModels += `# Query generated from SQL:\n` +
       `# \`\`\`\n` +
-      `${queryPP}\n` +
+      ` ${queryPP}\n` +
       `# \`\`\`\n`;
     pydanticModels += `class ${typedQuery.query.name}(BaseModel):\n` +
       `    params: ${typedQuery.query.paramTypeAlias}\n` +
@@ -418,6 +418,7 @@ export function generateDeclarationFile(typeDecSet: TypeDeclarationSet){
   let content = `# Pydantic models generated for queries found in "${stableFilePath}"\n`;
   content += 'from pydantic import BaseModel, Field\n';
   content += 'from typing import Optional, List\n\n';
+  content += 'from typing_extensions import NewType\n\n';
   
   content += generateDeclarations(typeDecSet.typedQueries);
   
