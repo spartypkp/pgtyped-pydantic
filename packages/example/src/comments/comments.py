@@ -2,6 +2,8 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
 
+from typing_extensions import NewType
+
 """ 'GetAllComments' parameters type """
 class IGetAllCommentsParams (BaseModel):
   id: float
@@ -23,11 +25,11 @@ class IGetAllCommentsQuery (BaseModel):
 
 # Query generated from SQL:
 # ```
-#  * SELECT * FROM book_comments WHERE id = :id! OR user_id = :id                                      
+  # SELECT * FROM book_comments WHERE id = :id! OR user_id = :id                                      
 # ```
 class getAllComments(BaseModel):
-    params: IGetAllCommentsParams
-    result: IGetAllCommentsResult
+    params: GetAllCommentsParams
+    result: GetAllCommentsResult
 
 
 """ 'GetAllCommentsByIds' parameters type """
@@ -51,19 +53,19 @@ class IGetAllCommentsByIdsQuery (BaseModel):
 
 # Query generated from SQL:
 # ```
-#  * SELECT * FROM book_comments WHERE id in :ids AND id in :ids!
+  # SELECT * FROM book_comments WHERE id in :ids AND id in :ids!
 # ```
 class getAllCommentsByIds(BaseModel):
-    params: IGetAllCommentsByIdsParams
-    result: IGetAllCommentsByIdsResult
+    params: GetAllCommentsByIdsParams
+    result: GetAllCommentsByIdsResult
 
 
 """ 'InsertComment' parameters type """
 class IInsertCommentParams (BaseModel):
-  comments: List[{
+  comments: List[
     userId: float,
     commentBody: str
-  }]
+  ]
 
 
 """ 'InsertComment' return type """
@@ -82,13 +84,13 @@ class IInsertCommentQuery (BaseModel):
 
 # Query generated from SQL:
 # ```
-#  * INSERT INTO book_comments (user_id, body)
- * -- NOTE: this is a note
- * VALUES :comments RETURNING *
+  # INSERT INTO book_comments (user_id, body)
+ # -- NOTE: this is a note
+ # VALUES :comments RETURNING *
 # ```
 class insertComment(BaseModel):
-    params: IInsertCommentParams
-    result: IInsertCommentResult
+    params: InsertCommentParams
+    result: InsertCommentResult
 
 
 """ 'SelectExistsTest' parameters type """
@@ -107,10 +109,10 @@ class ISelectExistsTestQuery (BaseModel):
 
 # Query generated from SQL:
 # ```
-#  * SELECT EXISTS ( SELECT 1 WHERE true ) AS "isTransactionExists"
+  # SELECT EXISTS ( SELECT 1 WHERE true ) AS "isTransactionExists"
 # ```
 class selectExistsTest(BaseModel):
-    params: ISelectExistsTestParams
-    result: ISelectExistsTestResult
+    params: SelectExistsTestParams
+    result: SelectExistsTestResult
 
 

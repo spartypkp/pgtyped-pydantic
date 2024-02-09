@@ -2,13 +2,15 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
 
+from typing_extensions import NewType
+
 """ 'SendNotifications' parameters type """
 class ISendNotificationsParams (BaseModel):
-  notifications: List[{
+  notifications: List[
     user_id: float,
     payload: Dict[str, Any],
     type: notification_type
-  }]
+  ]
 
 
 """ 'SendNotifications' return type """
@@ -24,12 +26,12 @@ class ISendNotificationsQuery (BaseModel):
 
 # Query generated from SQL:
 # ```
-#  * INSERT INTO notifications (user_id, payload, type)
- * VALUES :notifications RETURNING id as notification_id
+  # INSERT INTO notifications (user_id, payload, type)
+ # VALUES :notifications RETURNING id as notification_id
 # ```
 class sendNotifications(BaseModel):
-    params: ISendNotificationsParams
-    result: ISendNotificationsResult
+    params: SendNotificationsParams
+    result: SendNotificationsResult
 
 
 """ 'GetNotifications' parameters type """
@@ -55,14 +57,14 @@ class IGetNotificationsQuery (BaseModel):
 
 # Query generated from SQL:
 # ```
-#  * SELECT *
- *   FROM notifications
- *  WHERE user_id = :userId
- *  AND created_at > :date!
+  # SELECT *
+ #   FROM notifications
+ #  WHERE user_id = :userId
+ #  AND created_at > :date!
 # ```
 class getNotifications(BaseModel):
-    params: IGetNotificationsParams
-    result: IGetNotificationsResult
+    params: GetNotificationsParams
+    result: GetNotificationsResult
 
 
 """ 'ThresholdFrogs' parameters type """
@@ -85,13 +87,13 @@ class IThresholdFrogsQuery (BaseModel):
 
 # Query generated from SQL:
 # ```
-#  * SELECT u.user_name, n.payload, n.type
- * FROM notifications n
- * INNER JOIN users u on n.user_id = u.id
- * WHERE CAST (n.payload->'num_frogs' AS int) > :numFrogs!
+  # SELECT u.user_name, n.payload, n.type
+ # FROM notifications n
+ # INNER JOIN users u on n.user_id = u.id
+ # WHERE CAST (n.payload->'num_frogs' AS int) > :numFrogs!
 # ```
 class thresholdFrogs(BaseModel):
-    params: IThresholdFrogsParams
-    result: IThresholdFrogsResult
+    params: ThresholdFrogsParams
+    result: ThresholdFrogsResult
 
 

@@ -103,7 +103,7 @@ export async function queryToPydanticDeclarations(
 
   const typeData = await typeSource(queryData);
   const modelName = pascalCase(queryName);
-  const interfacePrefix = config.hungarianNotation ? 'I' : '';
+  const interfacePrefix = '';
 
   const typeError = 'errorCode' in typeData;
   const hasAnonymousColumns =

@@ -40,12 +40,21 @@ const SQLTransformCodec = t.type({
   mode: t.literal('sql'),
   ...transformCodecProps,
 });
+const PythonTransformCodec = t.type({
+  mode: t.literal('python'),
+  ...transformCodecProps,
+});
+
+export type PythonTransformConfig = t.TypeOf<typeof PythonTransformCodec>;
 
 const TransformCodec = t.union([
   TSTransformCodec,
   SQLTransformCodec,
   TSTypedSQLTagTransformCodec,
+  PythonTransformCodec, // Add PythonTransformCodec to the union
 ]);
+
+
 
 export type TransformConfig = t.TypeOf<typeof TransformCodec>;
 

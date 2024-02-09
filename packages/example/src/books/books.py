@@ -1,6 +1,7 @@
 # Pydantic models generated for queries found in "src/books/books.sql"
 from pydantic import BaseModel, Field
 from typing import Optional, List
+
 from typing_extensions import NewType
 
 """ 'FindBookById' parameters type """
@@ -25,11 +26,11 @@ class IFindBookByIdQuery (BaseModel):
 
 # Query generated from SQL:
 # ```
-#  * SELECT * FROM books WHERE id = :id
+  # SELECT * FROM books WHERE id = :id
 # ```
 class findBookById(BaseModel):
-    params: IFindBookByIdParams
-    result: IFindBookByIdResult
+    params: FindBookByIdParams
+    result: FindBookByIdResult
 
 
 """ 'FindAllBooks' parameters type """
@@ -52,10 +53,10 @@ class IFindAllBooksQuery (BaseModel):
 
 # Query generated from SQL:
 # ```
-#  * SELECT * FROM books WHERE id is not null
+  # SELECT * FROM books WHERE id is not null
 # ```
 class findAllBooks(BaseModel):
-    params: IFindAllBooksParams
-    result: IFindAllBooksResult
+    params: FindAllBooksParams
+    result: FindAllBooksResult
 
 
