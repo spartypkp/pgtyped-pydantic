@@ -153,7 +153,9 @@ try {
     console.log('Config file changed. Exiting.');
     process.exit();
   });
+  console.log(configPath)
   const config = parseConfig(configPath, connectionUri);
+  console.log(config);
   main(config, isWatchMode || false, fileOverride).catch((e) =>
     debug('error in main: %o', e.message),
   );

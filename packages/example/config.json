@@ -1,9 +1,9 @@
 {
     "transforms": [
       {
-        "mode": "sql",
-        "include": "**/*.sql",
-        "emitTemplate": "{{dir}}/{{name}}.py"
+        "mode": "python",
+        "include": "**/*.py",
+        "emitTemplate": "{{dir}}/{{name}}_ts.py"
       }    
     ],
     "typesOverrides": {

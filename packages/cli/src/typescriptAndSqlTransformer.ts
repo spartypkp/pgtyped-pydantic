@@ -5,7 +5,7 @@ import { ParsedConfig, TransformConfig } from './config.js';
 import { TransformJob, WorkerPool } from './index.js';
 import { debug } from './util.js';
 import { processFileFnResult } from './worker.js';
-import { writeSqlQueries } from './pythonReader';
+import { writeSqlQueries } from './pythonReader.js';
 import { write } from 'fs';
 
 // tslint:disable:no-console
