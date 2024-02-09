@@ -7,7 +7,13 @@ import { debug } from './util.js';
 import { processFileFnResult } from './worker.js';
 import { writeSqlQueries } from './pythonReader.js';
 import { write } from 'fs';
-
+import { TypeAllocator, TypeMapping, TypeScope } from './types.js';
+import worker from 'piscina';
+import { AsyncQueue } from '@pgtyped/wire';
+import {
+  generateDeclarationFile,
+  generateTypedecsFromFile,
+} from './generator.js';
 // tslint:disable:no-console
 
 export class TypescriptAndSqlTransformer {
@@ -77,19 +83,28 @@ export class TypescriptAndSqlTransformer {
       if (fileName.includes('_')) {
         return;
       }
-      
-      let tsFilePath = await writeSqlQueries(fileName);
-      return this.processTsFile(tsFilePath);
+      // DIRECTLY SEND STRING TO generator.ts
+      const [python_contents, lineNumber, lineIndex] = await writeSqlQueries(fileName);
+      // Tracked variables:
+      // Filepath - in this fn
+      // Transform - this.transform
+      // Explain current process first
+      // 1. Send filePath of temporary ts file to processTsFile
+      // 2. processTsFile will send the file to worker.ts
+      // 3. worker.ts will call getTypeDecs
+      // 4. 
+      return this.processTsFile(fileName, [python_contents, lineNumber, lineIndex]);
       
     }
     return this.processTsFile(fileName);
   }
 
-  private async processTsFile(fileName: string) {
+  private async processTsFile(fileName: string, python_content?: any) {
     const result = (await this.pool.run(
       {
         fileName,
         transform: this.transform,
+        python_content,
       },
       'processFile',
     )) as Awaited<processFileFnResult>;

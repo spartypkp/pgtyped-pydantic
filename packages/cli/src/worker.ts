@@ -10,6 +10,7 @@ import {
   generateTypedecsFromFile,
 } from './generator.js';
 import { TypeAllocator, TypeMapping, TypeScope } from './types.js';
+import { removeSqlQueries } from './pythonReader.js';
 
 // disable autoescape as it breaks windows paths
 // see https://github.com/adelsz/pgtyped/issues/519 for details
@@ -47,11 +48,21 @@ async function connectAndGetFileContents(fileName: string) {
 export async function getTypeDecs({
   fileName,
   transform,
+  python_content,
 }: {
   fileName: string;
   transform: TransformConfig;
+  python_content?: any;
 }) {
-  const contents = await connectAndGetFileContents(fileName);
+  let contents;
+  if (python_content !== undefined) {
+    const python_contents:string= python_content[0];
+    const lineNumber:number= python_content[1];
+    const lineIndex:number = python_content[2];
+    contents = python_content;
+  } else {
+    contents = await connectAndGetFileContents(fileName);
+  }
   const types = new TypeAllocator(TypeMapping(config.typesOverrides));
 
   if (transform.mode === 'sql') {
@@ -76,10 +87,13 @@ export type getTypeDecsFnResult = ReturnType<typeof getTypeDecs>;
 export async function processFile({
   fileName,
   transform,
+  python_content,
 }: {
   fileName: string;
   transform: TransformConfig;
+  python_content?: any;
 }): Promise<IWorkerResult> {
+  
   const ppath = path.parse(fileName) as ExtendedParsedPath;
   ppath.dir_base = path.basename(ppath.dir);
   let decsFileName;
@@ -92,7 +106,12 @@ export async function processFile({
 
   let typeDecSet;
   try {
-    typeDecSet = await getTypeDecs({ fileName, transform });
+    if (python_content !== undefined) {
+
+      typeDecSet = await getTypeDecs({ fileName, transform, python_content });
+    } else {
+      typeDecSet = await getTypeDecs({ fileName, transform });
+    }
   } catch (e) {
     return {
       error: e,
@@ -100,7 +119,7 @@ export async function processFile({
     };
   }
   const relativePath = path.relative(process.cwd(), decsFileName);
-
+  
   if (typeDecSet.typedQueries.length > 0) {
     const declarationFileContents = await generateDeclarationFile(typeDecSet);
     const oldDeclarationFileContents = (await fs.pathExists(decsFileName))
@@ -108,6 +127,10 @@ export async function processFile({
       : null;
     if (oldDeclarationFileContents !== declarationFileContents) {
       await fs.outputFile(decsFileName, declarationFileContents);
+      if (python_content !== undefined) {
+        // Delete the sql queries from the python file, so that it isn't processed again
+        await removeSqlQueries(fileName, python_content[1], python_content[2]);
+      }
       return {
         skipped: false,
         typeDecsLength: typeDecSet.typedQueries.length,
