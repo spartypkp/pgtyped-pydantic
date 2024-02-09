@@ -1,6 +1,6 @@
 {
-  "name": "@pgtyped/cli",
-  "version": "2.3.0",
+  "name": "@pgtyped-pydantic/cli",
+  "version": "0.1.0",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -12,7 +12,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/adelsz/pgtyped.git"
+    "url": "https://github.com/spartypkp/pgtyped-pydantic"
   },
   "files": [
     "lib"
@@ -20,7 +20,7 @@
   "engines": {
     "node": ">=14.16"
   },
-  "homepage": "https://github.com/adelsz/pgtyped",
+  "homepage": "https://github.com/spartypkp/pgtyped-pydantic",
   "publishConfig": {
     "access": "public"
   },
@@ -31,7 +31,7 @@
     "watch": "tsc --watch --preserveWatchOutput"
   },
   "bin": {
-    "pgtyped": "lib/index.js"
+    "pgtyped-pydantic": "lib/index.js"
   },
   "dependencies": {
     "@pgtyped/parser": "^2.3.0",

@@ -3,7 +3,7 @@
       {
         "mode": "python",
         "include": "**/*.py",
-        "emitTemplate": "{{dir}}/{{name}}_ts.py"
+        "emitTemplate": "{{dir}}/{{name}}_py.py"
       }    
     ],
     "typesOverrides": {

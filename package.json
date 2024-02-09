@@ -2,7 +2,7 @@
   "name": "pgtyped",
   "version": "0.0.1",
   "main": "index.js",
-  "author": "Adel Salakh",
+  "author": "Will Diamond",
   "license": "MIT",
   "scripts": {
     "clean": "rm -r packages/*/lib",
