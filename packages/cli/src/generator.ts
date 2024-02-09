@@ -60,6 +60,7 @@ export const generateModel = (modelName: string, fields: IField[]) => {
       if (comment) {
         lines.push(`  # ${escapeComment(comment)} `);
       }
+      console.log("Test!")
       const paramSuffix = optional ? ' = None' : '';
       const entryLine = `  ${escapeKey(fieldName)}${paramSuffix}: ${fieldType},`;
       lines.push(entryLine);

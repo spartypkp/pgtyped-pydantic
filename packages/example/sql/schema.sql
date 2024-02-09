@@ -27,6 +27,9 @@ CREATE TABLE authors (
   last_name TEXT
 );
 
+SELECT * FROM authors WHERE id is not null;
+
+
 CREATE TABLE books (
   id SERIAL PRIMARY KEY,
   rank INTEGER,
