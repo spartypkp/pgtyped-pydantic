@@ -29,6 +29,7 @@
     "typescript": "5.0.4"
   },
   "dependencies": {
+    "@pgtyped/runtime": "^2.3.0",
     "io-ts": "^2.1.2"
   }
 }

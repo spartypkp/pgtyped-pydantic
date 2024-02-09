@@ -12,51 +12,72 @@ import os from 'os';
 import { AliasedType, EnumType } from '@pgtyped/query/lib/type.js';
 import path from 'path';
 
-const String: Type = { name: 'string' };
-const Number: Type = { name: 'number' };
-const NumberOrString: Type = {
-  name: 'NumberOrString',
-  definition: 'number | string',
-};
-const Boolean: Type = { name: 'boolean' };
-const Date: Type = { name: 'Date' };
-const DateOrString: Type = {
-  name: 'DateOrString',
-  definition: 'Date | string',
-};
-const Bytes: Type = { name: 'Buffer' };
-const Void: Type = { name: 'undefined' };
-const Json: Type = {
-  name: 'Json',
-  definition:
-    'null | boolean | number | string | Json[] | { [key: string]: Json }',
-};
-const getArray = (baseType: Type): Type => ({
-  name: `${baseType.name}Array`,
-  definition: `(${baseType.definition ?? baseType.name})[]`,
-});
 
+// Old types
+// const String: Type = { name: 'string' };
+// const Float: Type = { name: 'Float' };
+// const FloatOrString: Type = {
+//   name: 'FloatOrString',
+//   definition: 'Float | string',
+// };
+// const Boolean: Type = { name: 'boolean' };
+// const Date: Type = { name: 'Date' };
+// const DateOrString: Type = {
+//   name: 'DateOrString',
+//   definition: 'Date | string',
+// };
+// const Bytes: Type = { name: 'Buffer' };
+// const Void: Type = { name: 'undefined' };
+// const Json: Type = {
+//   name: 'Json',
+//   definition:
+//     'null | boolean | Float | string | Json[] | { [key: string]: Json }',
+// };
+
+const String: Type = { name: 'str' };
+const Float: Type = { name: 'float' }; // Python's float covers both int and float from TypeScript
+const FloatOrString: Type = {
+  name: 'Union[float, str]',
+  definition: 'Union[float, str]',
+};
+const Boolean: Type = { name: 'bool' };
+const Date: Type = { name: 'datetime' }; // Assuming you want to use datetime from Python's datetime module
+const DateOrString: Type = {
+  name: 'Union[datetime, str]',
+  definition: 'Union[datetime, str]',
+};
+const Bytes: Type = { name: 'bytes' };
+const Void: Type = { name: 'None' };
+const Json: Type = {
+  name: 'Dict[str, Any]', // Assuming you want to use Dict and Any from Python's typing module
+  definition: 'Dict[str, Any]',
+};
+
+const getArray = (baseType: Type): Type => ({
+  name: `List[${baseType.name}]`,
+  definition: `List[${baseType.definition ?? baseType.name}]`,
+});
 export const DefaultTypeMapping = Object.freeze({
   // Integer types
-  int2: { parameter: Number, return: Number },
-  int4: { parameter: Number, return: Number },
-  int8: { parameter: NumberOrString, return: String },
-  smallint: { parameter: Number, return: Number },
-  int: { parameter: Number, return: Number },
-  bigint: { parameter: NumberOrString, return: String },
+  int2: { parameter: Float, return: Float },
+  int4: { parameter: Float, return: Float },
+  int8: { parameter: FloatOrString, return: String },
+  smallint: { parameter: Float, return: Float },
+  int: { parameter: Float, return: Float },
+  bigint: { parameter: FloatOrString, return: String },
 
   // Precision types
-  real: { parameter: Number, return: Number },
-  float4: { parameter: Number, return: Number },
-  float: { parameter: Number, return: Number },
-  float8: { parameter: Number, return: Number },
-  numeric: { parameter: NumberOrString, return: String },
-  decimal: { parameter: NumberOrString, return: String },
+  real: { parameter: Float, return: Float },
+  float4: { parameter: Float, return: Float },
+  float: { parameter: Float, return: Float },
+  float8: { parameter: Float, return: Float },
+  numeric: { parameter: FloatOrString, return: String },
+  decimal: { parameter: FloatOrString, return: String },
 
   // Serial types
-  smallserial: { parameter: Number, return: Number },
-  serial: { parameter: Number, return: Number },
-  bigserial: { parameter: NumberOrString, return: String },
+  smallserial: { parameter: Float, return: Float },
+  serial: { parameter: Float, return: Float },
+  bigserial: { parameter: FloatOrString, return: String },
 
   // Common string types
   uuid: { parameter: String, return: String },
@@ -99,7 +120,7 @@ export const DefaultTypeMapping = Object.freeze({
   bytea: { parameter: Bytes, return: Bytes },
 
   // Postgis types
-  point: { parameter: getArray(Number), return: getArray(Number) },
+  point: { parameter: getArray(Float), return: getArray(Float) },
 });
 
 export type BuiltinTypes = keyof typeof DefaultTypeMapping;
@@ -220,14 +241,10 @@ function declareAlias(name: string, definition: string): string {
   return `export type ${name} = ${definition};\n`;
 }
 
+// Most likely not needed
 function declareStringUnion(name: string, values: string[]) {
-  return declareAlias(
-    name,
-    values
-      .sort()
-      .map((v) => `'${v}'`)
-      .join(' | '),
-  );
+  const enumValues = values.sort().map((v) => `${v} = "${v}"`).join(',\n    ');
+  return `class ${name}(Enum):\n    ${enumValues}\n`;
 }
 
 export enum TypeScope {

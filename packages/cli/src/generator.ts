@@ -33,10 +33,10 @@ export interface IField {
   comment?: string;
 }
 
-const interfaceGen = (interfaceName: string, contents: string) =>
-  `export interface ${interfaceName} {
+const interfaceGen = (modelName: string, contents: string) =>
+  `class ${modelName} (BaseModel):
 ${contents}
-}\n\n`;
+\n\n`;
 
 export function escapeComment(comment: string) {
   return comment.replace(/\*\//g, '*\\/');
@@ -50,7 +50,7 @@ export function escapeKey(key: string) {
   return `"${key}"`;
 }
 
-export const generateInterface = (interfaceName: string, fields: IField[]) => {
+export const generateModel = (modelName: string, fields: IField[]) => {
   const sortedFields = fields
     .slice()
     .sort((a, b) => a.fieldName.localeCompare(b.fieldName));
@@ -58,20 +58,21 @@ export const generateInterface = (interfaceName: string, fields: IField[]) => {
     .map(({ fieldName, fieldType, comment, optional }) => {
       const lines = [];
       if (comment) {
-        lines.push(`  /** ${escapeComment(comment)} */`);
+        lines.push(`  # ${escapeComment(comment)} `);
       }
-      const keySuffix = optional ? '?' : '';
-      const entryLine = `  ${escapeKey(fieldName)}${keySuffix}: ${fieldType};`;
+      const paramSuffix = optional ? ' = None' : '';
+      const entryLine = `  ${escapeKey(fieldName)}${paramSuffix}: ${fieldType},`;
       lines.push(entryLine);
       return lines.join('\n');
     })
     .join('\n');
-  return interfaceGen(interfaceName, contents);
+  return interfaceGen(modelName, contents);
 };
-
+// Converted to use Python typing modules' NewType
 export const generateTypeAlias = (typeName: string, alias: string) =>
-  `export type ${typeName} = ${alias};\n\n`;
+  `${typeName} = NewType('${typeName}', ${alias})\n\n`;
 
+// TODO: Convert
 type ParsedQuery =
   | {
       ast: TSQueryAST;
@@ -82,7 +83,8 @@ type ParsedQuery =
       mode: ProcessingMode.SQL;
     };
 
-export async function queryToTypeDeclarations(
+// I (ChatGPT) will attempt to convert this function to Pydantic
+export async function queryToPydanticDeclarations(
   parsedQuery: ParsedQuery,
   typeSource: TypeSource,
   types: TypeAllocator,
@@ -99,7 +101,7 @@ export async function queryToTypeDeclarations(
   }
 
   const typeData = await typeSource(queryData);
-  const interfaceName = pascalCase(queryName);
+  const modelName = pascalCase(queryName);
   const interfacePrefix = config.hungarianNotation ? 'I' : '';
 
   const typeError = 'errorCode' in typeData;
@@ -115,7 +117,7 @@ export async function queryToTypeDeclarations(
       console.error('Error in query. Details: %o', typeData);
       if (config.failOnError) {
         throw new Error(
-          `Query "${queryName}" is invalid. Can't generate types.`,
+          `Query "${queryName}" is invalid. Can't generate models.`,
         );
       }
     } else {
@@ -128,17 +130,17 @@ export async function queryToTypeDeclarations(
       explanation = `Query contains an anonymous column. Consider giving the column an explicit name.`;
     }
 
-    const returnInterface = generateTypeAlias(
-      `${interfacePrefix}${interfaceName}Result`,
-      'never',
+    const returnModel = generateTypeAlias(
+      `${modelName}Result`,
+      'Any',
     );
-    const paramInterface = generateTypeAlias(
-      `${interfacePrefix}${interfaceName}Params`,
-      'never',
+    const paramModel = generateTypeAlias(
+      `${modelName}Params`,
+      'Any',
     );
-    const resultErrorComment = `/** Query '${queryName}' is invalid, so its result is assigned type 'never'.\n * ${explanation} */\n`;
-    const paramErrorComment = `/** Query '${queryName}' is invalid, so its parameters are assigned type 'never'.\n * ${explanation} */\n`;
-    return `${resultErrorComment}${returnInterface}${paramErrorComment}${paramInterface}`;
+    const resultErrorComment = `# Query '${queryName}' is invalid, so its result is assigned type 'Any'.\n * ${explanation} */\n`;
+    const paramErrorComment = `# Query '${queryName}' is invalid, so its parameters are assigned type 'Any'.\n * ${explanation} */\n`;
+    return `${resultErrorComment}${returnModel}${paramErrorComment}${paramModel}`;
   }
 
   const { returnTypes, paramMetadata } = typeData;
@@ -147,7 +149,7 @@ export async function queryToTypeDeclarations(
   const paramFieldTypes: IField[] = [];
 
   returnTypes.forEach(({ returnName, type, nullable, comment }) => {
-    let tsTypeName = types.use(type, TypeScope.Return);
+    let pyTypeName = types.use(type, TypeScope.Return);
 
     const lastCharacter = returnName[returnName.length - 1]; // Checking for type hints
     const addNullability = lastCharacter === '?';
@@ -156,7 +158,7 @@ export async function queryToTypeDeclarations(
       (addNullability || nullable || nullable == null) &&
       !removeNullability
     ) {
-      tsTypeName += ' | null';
+      pyTypeName = `Optional[${pyTypeName}]`;
     }
 
     if (addNullability || removeNullability) {
@@ -167,7 +169,7 @@ export async function queryToTypeDeclarations(
       fieldName: config.camelCaseColumnNames
         ? camelCase(returnName)
         : returnName,
-      fieldType: tsTypeName,
+      fieldType: pyTypeName,
       comment,
     });
   });
@@ -184,20 +186,21 @@ export async function queryToTypeDeclarations(
           ? param.assignedIndex[0]
           : param.assignedIndex;
       const pgTypeName = params[assignedIndex - 1];
-      let tsTypeName = types.use(pgTypeName, TypeScope.Parameter);
+      let pyTypeName = types.use(pgTypeName, TypeScope.Parameter);
 
       if (!param.required) {
-        tsTypeName += ' | null | void';
+        pyTypeName = `Optional[${pyTypeName}]`;
       }
 
       // Allow optional scalar parameters to be missing from parameters object
-      const optional =
-        param.type === ParameterTransform.Scalar && !param.required;
+      // ChatGPT wants to remove optional, we shall see if it's needed
+      // const optional =
+      //   param.type === ParameterTransform.Scalar && !param.required;
 
       paramFieldTypes.push({
-        optional,
+       //optional,
         fieldName: param.name,
-        fieldType: isArray ? `readonly (${tsTypeName})[]` : tsTypeName,
+        fieldType: isArray ? `List[(${pyTypeName})]` : pyTypeName,
       });
     } else {
       const isArray = param.type === ParameterTransform.PickSpread;
@@ -209,12 +212,12 @@ export async function queryToTypeDeclarations(
           );
           return p.required
             ? `    ${p.name}: ${paramType}`
-            : `    ${p.name}: ${paramType} | null | void`;
+            : `    ${p.name}: Optional[${paramType}]`;
         })
         .join(',\n');
       fieldType = `{\n${fieldType}\n  }`;
       if (isArray) {
-        fieldType = `readonly (${fieldType})[]`;
+        fieldType = `List[${fieldType}]`;
       }
       paramFieldTypes.push({
         fieldName: param.name,
@@ -229,37 +232,41 @@ export async function queryToTypeDeclarations(
   // tslint:disable-next-line:no-console
   types.errors.forEach((err) => console.log(err));
 
-  const resultInterfaceName = `${interfacePrefix}${interfaceName}Result`;
-  const returnTypesInterface =
-    `/** '${queryName}' return type */\n` +
+  const resultModelName = `${interfacePrefix}${modelName}Result`;
+  const returnTypesModel =
+    `""" '${queryName}' return type """\n` +
     (returnFieldTypes.length > 0
-      ? generateInterface(
-          `${interfacePrefix}${interfaceName}Result`,
+      ? generateModel(
+          `${interfacePrefix}${modelName}Result`,
           returnFieldTypes,
         )
-      : generateTypeAlias(resultInterfaceName, 'void'));
+      : generateTypeAlias(resultModelName, 'None'));
 
-  const paramInterfaceName = `${interfacePrefix}${interfaceName}Params`;
-  const paramTypesInterface =
-    `/** '${queryName}' parameters type */\n` +
+  const paramModelName = `${interfacePrefix}${modelName}Params`;
+  const paramTypesModel =
+    `""" '${queryName}' parameters type """\n` +
     (paramFieldTypes.length > 0
-      ? generateInterface(
-          `${interfacePrefix}${interfaceName}Params`,
+      ? generateModel(
+          `${interfacePrefix}${modelName}Params`,
           paramFieldTypes,
         )
-      : generateTypeAlias(paramInterfaceName, 'void'));
+      : generateTypeAlias(paramModelName, 'None'));
 
   const typePairInterface =
-    `/** '${queryName}' query type */\n` +
-    generateInterface(`${interfacePrefix}${interfaceName}Query`, [
-      { fieldName: 'params', fieldType: paramInterfaceName },
-      { fieldName: 'result', fieldType: resultInterfaceName },
+    `""" '${queryName}' query type """\n` +
+    generateModel(`${interfacePrefix}${modelName}Query`, [
+      { fieldName: 'params', fieldType: paramModelName },
+      { fieldName: 'result', fieldType: resultModelName },
     ]);
 
-  return [paramTypesInterface, returnTypesInterface, typePairInterface].join(
+  return [paramTypesModel, returnTypesModel, typePairInterface].join(
     '',
   );
 }
+
+
+
+
 
 export type TSTypedQuery = {
   mode: 'ts';
@@ -269,7 +276,7 @@ export type TSTypedQuery = {
     ast: TSQueryAST;
     queryTypeAlias: string;
   };
-  typeDeclaration: string;
+  pydanticModel: string;
 };
 
 type SQLTypedQuery = {
@@ -282,7 +289,7 @@ type SQLTypedQuery = {
     paramTypeAlias: string;
     returnTypeAlias: string;
   };
-  typeDeclaration: string;
+  pydanticModel: string;
 };
 
 export type TypedQuery = TSTypedQuery | SQLTypedQuery;
@@ -323,7 +330,7 @@ export async function generateTypedecsFromFile(
     let typedQuery: TypedQuery;
     if (transform.mode === 'sql') {
       const sqlQueryAST = queryAST as SQLQueryAST;
-      const result = await queryToTypeDeclarations(
+      const result = await queryToPydanticDeclarations(
         { ast: sqlQueryAST, mode: ProcessingMode.SQL },
         typeSource,
         types,
@@ -343,11 +350,12 @@ export async function generateTypedecsFromFile(
           )}Result`,
         },
         fileName,
-        typeDeclaration: result,
+        // Rename this maybe
+        pydanticModel: result,
       };
     } else {
       const tsQueryAST = queryAST as TSQueryAST;
-      const result = await queryToTypeDeclarations(
+      const result = await queryToPydanticDeclarations(
         {
           ast: tsQueryAST,
           mode: ProcessingMode.TS,
@@ -366,7 +374,7 @@ export async function generateTypedecsFromFile(
             tsQueryAST.name,
           )}Query`,
         },
-        typeDeclaration: result,
+        pydanticModel: result,
       };
     }
     typedQueries.push(typedQuery);
@@ -374,36 +382,30 @@ export async function generateTypedecsFromFile(
   return { typedQueries, typeDefinitions: types.toTypeDefinitions(), fileName };
 }
 
-export function generateDeclarations(typeDecs: TypedQuery[]): string {
-  let typeDeclarations = '';
-  for (const typeDec of typeDecs) {
-    typeDeclarations += typeDec.typeDeclaration;
-    if (typeDec.mode === 'ts') {
+export function generateDeclarations(typedQueries: TypedQuery[]): string {
+  let pydanticModels = '';
+  for (const typedQuery of typedQueries) {
+    pydanticModels += typedQuery.pydanticModel;
+    if (typedQuery.mode === 'ts') {
       continue;
     }
-    const queryPP = typeDec.query.ast.statement.body
+    const queryPP = typedQuery.query.ast.statement.body
       .split('\n')
       .map((s: string) => ' * ' + s)
       .join('\n');
-    typeDeclarations += `const ${typeDec.query.name}IR: any = ${JSON.stringify(
-      typeDec.query.ir,
-    )};\n\n`;
-    typeDeclarations +=
-      `/**\n` +
-      ` * Query generated from SQL:\n` +
-      ` * \`\`\`\n` +
+    pydanticModels += `# Query generated from SQL:\n` +
+      `# \`\`\`\n` +
       `${queryPP}\n` +
-      ` * \`\`\`\n` +
-      ` */\n`;
-    typeDeclarations +=
-      `export const ${typeDec.query.name} = ` +
-      `new PreparedQuery<${typeDec.query.paramTypeAlias},${typeDec.query.returnTypeAlias}>` +
-      `(${typeDec.query.name}IR);\n\n\n`;
+      `# \`\`\`\n`;
+    pydanticModels += `class ${typedQuery.query.name}(BaseModel):\n` +
+      `    params: ${typedQuery.query.paramTypeAlias}\n` +
+      `    result: ${typedQuery.query.returnTypeAlias}\n\n\n`;
   }
-  return typeDeclarations;
+  return pydanticModels;
 }
 
-export function generateDeclarationFile(typeDecSet: TypeDeclarationSet) {
+
+export function generateDeclarationFile(typeDecSet: TypeDeclarationSet){
   // file paths in generated files must be stable across platforms
   // https://github.com/adelsz/pgtyped/issues/230
   const isWindowsPath = path.sep === '\\';
@@ -412,13 +414,12 @@ export function generateDeclarationFile(typeDecSet: TypeDeclarationSet) {
     ? typeDecSet.fileName.replace(/\\/g, '/')
     : typeDecSet.fileName;
 
-  let content = `/** Types generated for queries found in "${stableFilePath}" */\n`;
-  content += TypeAllocator.typeDefinitionDeclarations(
-    typeDecSet.fileName,
-    typeDecSet.typeDefinitions,
-  );
-  content += '\n';
+  let content = `# Pydantic models generated for queries found in "${stableFilePath}"\n`;
+  content += 'from pydantic import BaseModel, Field\n';
+  content += 'from typing import Optional, List\n\n';
+  
   content += generateDeclarations(typeDecSet.typedQueries);
+  
   return content;
 }
 
@@ -429,7 +430,7 @@ export function genTypedSQLOverloadFunctions(
   return typedQueries
     .map(
       (typeDec) =>
-        `export function ${functionName}(s: \`${typeDec.query.ast.text}\`): ReturnType<typeof sourceSql<${typeDec.query.queryTypeAlias}>>;`,
+        `class ${functionName}(BaseModel):\n    query: Literal["${typeDec.query.ast.text}"]\n    result: ${typeDec.query.queryTypeAlias}\n`,
     )
     .filter((s) => s)
     .join('\n');
