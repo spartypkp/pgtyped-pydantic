@@ -93,6 +93,7 @@ export async function queryToPydanticDeclarations(
 ): Promise<string> {
   let queryData;
   let queryName;
+  console.log('parsedQuery:', parsedQuery);
   if (parsedQuery.mode === ProcessingMode.TS) {
     queryName = pascalCase(parsedQuery.ast.name);
     queryData = processTSQueryAST(parsedQuery.ast);

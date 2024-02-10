@@ -55,14 +55,14 @@ export async function getTypeDecs({
   python_content?: any;
 }) {
   let contents;
+  console.log(`Inside getTypeDecs, fileName: ${fileName}`)
   if (python_content !== undefined) {
-    const python_contents:string= python_content[0];
-    const lineNumber:number= python_content[1];
-    const lineIndex:number = python_content[2];
-    contents = python_content;
+    
+    contents = python_content[0];
   } else {
     contents = await connectAndGetFileContents(fileName);
   }
+  console.log(`----Contents: ${contents}`)
   const types = new TypeAllocator(TypeMapping(config.typesOverrides));
 
   if (transform.mode === 'sql') {
@@ -93,9 +93,11 @@ export async function processFile({
   transform: TransformConfig;
   python_content?: any;
 }): Promise<IWorkerResult> {
-  
+  console.log(`----Processing ${fileName}`);
   const ppath = path.parse(fileName) as ExtendedParsedPath;
+  console.log(`----Parsed path: ${ppath.dir_base}`)
   ppath.dir_base = path.basename(ppath.dir);
+  console.log(`----Dir base: ${ppath.dir_base}`)
   let decsFileName;
   if ('emitTemplate' in transform && transform.emitTemplate) {
     decsFileName = nun.renderString(transform.emitTemplate, ppath);
@@ -103,13 +105,15 @@ export async function processFile({
     const suffix = transform.mode === 'ts' ? 'types.ts' : 'ts';
     decsFileName = path.resolve(ppath.dir, `${ppath.name}.${suffix}`);
   }
+  console.log(`----Decs file name: ${decsFileName}`)
 
   let typeDecSet;
   try {
     if (python_content !== undefined) {
-
+      console.log(`---- Python case! calling getTypeDecs with python_content`)
       typeDecSet = await getTypeDecs({ fileName, transform, python_content });
     } else {
+      console.log(`---- Not python case! calling getTypeDecs without python_content`)
       typeDecSet = await getTypeDecs({ fileName, transform });
     }
   } catch (e) {
@@ -119,7 +123,7 @@ export async function processFile({
     };
   }
   const relativePath = path.relative(process.cwd(), decsFileName);
-  
+  console.log(`----Relative path: ${relativePath}`)
   if (typeDecSet.typedQueries.length > 0) {
     const declarationFileContents = await generateDeclarationFile(typeDecSet);
     const oldDeclarationFileContents = (await fs.pathExists(decsFileName))
