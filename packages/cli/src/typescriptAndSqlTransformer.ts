@@ -87,16 +87,23 @@ export class TypescriptAndSqlTransformer {
       if (fileName.includes('_')) {
         return;
       }
+      console.log('og fileName:', fileName)
       // DIRECTLY SEND STRING TO generator.ts
       const [python_contents, lineNumber, lineIndex] = await writeSqlQueries(fileName);
       // Remove .py from file name
-      fileName = fileName.slice(0, -3)+'.ts';
-      const tempFilePath = path.join(os.tmpdir(), fileName);
+      let tfileName = fileName.slice(0, -3)+'.ts';
+      console.log('fileName:', tfileName);
+      const baseName = path.basename(tfileName);
+      console.log('baseName:', baseName)
+      const tempFilePath = path.join(os.tmpdir(), baseName);
+      console.log('tempFilePath:', tempFilePath)
+      // Create the temporary file
+
 
       // Write data to the temporary file
       fs.writeFileSync(tempFilePath, python_contents);
 
-      this.processTsFile(tempFilePath);
+      await this.processTsFile(tempFilePath);
       // Remove the temporary file
       fs.unlinkSync(tempFilePath);
       await removeSqlQueries(fileName, lineNumber, lineIndex);

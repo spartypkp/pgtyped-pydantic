@@ -1,8 +1,8 @@
 {
     "transforms": [
       {
-        "mode": "ts",
-        "include": "**/*.ts",
+        "mode": "python",
+        "include": "**/*.py",
         "emitTemplate": "{{dir}}/{{name}}_py.py"
       }    
     ],
