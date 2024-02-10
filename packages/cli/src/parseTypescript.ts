@@ -13,7 +13,6 @@ export function parseFile(
   sourceFile: ts.SourceFile,
   transformConfig: TransformConfig | undefined,
 ): TSParseResult {
-  console.log('parseFile', sourceFile);
   const foundNodes: INode[] = [];
   parseNode(sourceFile);
 

@@ -5,7 +5,7 @@ import { ParsedConfig, TransformConfig } from './config.js';
 import { TransformJob, WorkerPool } from './index.js';
 import { debug } from './util.js';
 import { processFileFnResult } from './worker.js';
-import { writeSqlQueries } from './pythonReader.js';
+import { writeSqlQueries, removeSqlQueries } from './pythonReader.js';
 import { write } from 'fs';
 import { TypeAllocator, TypeMapping, TypeScope } from './types.js';
 import worker from 'piscina';
@@ -14,6 +14,10 @@ import {
   generateDeclarationFile,
   generateTypedecsFromFile,
 } from './generator.js';
+import fs from 'fs';
+
+import os from 'os';
+import { remove } from 'fs-extra';
 // tslint:disable:no-console
 
 export class TypescriptAndSqlTransformer {
@@ -85,26 +89,27 @@ export class TypescriptAndSqlTransformer {
       }
       // DIRECTLY SEND STRING TO generator.ts
       const [python_contents, lineNumber, lineIndex] = await writeSqlQueries(fileName);
-      // Tracked variables:
-      // Filepath - in this fn
-      // Transform - this.transform
-      // Explain current process first
-      // 1. Send filePath of temporary ts file to processTsFile
-      // 2. processTsFile will send the file to worker.ts
-      // 3. worker.ts will call getTypeDecs
-      // 4. 
-      return this.processTsFile(fileName, [python_contents, lineNumber, lineIndex]);
+      // Remove .py from file name
+      fileName = fileName.slice(0, -3)+'.ts';
+      const tempFilePath = path.join(os.tmpdir(), fileName);
+
+      // Write data to the temporary file
+      fs.writeFileSync(tempFilePath, python_contents);
+
+      this.processTsFile(tempFilePath);
+      // Remove the temporary file
+      fs.unlinkSync(tempFilePath);
+      await removeSqlQueries(fileName, lineNumber, lineIndex);
       
     }
     return this.processTsFile(fileName);
   }
 
-  private async processTsFile(fileName: string, python_content?: any) {
+  private async processTsFile(fileName: string) {
     const result = (await this.pool.run(
       {
         fileName,
         transform: this.transform,
-        python_content,
       },
       'processFile',
     )) as Awaited<processFileFnResult>;
