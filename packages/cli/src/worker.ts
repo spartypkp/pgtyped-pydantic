@@ -10,7 +10,7 @@ import {
   generateTypedecsFromFile,
 } from './generator.js';
 import { TypeAllocator, TypeMapping, TypeScope } from './types.js';
-import { removeSqlQueries } from './pythonReader.js';
+
 
 // disable autoescape as it breaks windows paths
 // see https://github.com/adelsz/pgtyped/issues/519 for details

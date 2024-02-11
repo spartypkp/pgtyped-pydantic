@@ -5,7 +5,7 @@ import { ParsedConfig, TransformConfig } from './config.js';
 import { TransformJob, WorkerPool } from './index.js';
 import { debug } from './util.js';
 import { processFileFnResult } from './worker.js';
-import { writeSqlQueries, removeSqlQueries } from './pythonReader.js';
+import { writeSqlQueries} from './pythonReader.js';
 import { write } from 'fs';
 import { TypeAllocator, TypeMapping, TypeScope } from './types.js';
 import worker from 'piscina';
@@ -88,25 +88,36 @@ export class TypescriptAndSqlTransformer {
         return;
       }
       console.log('og fileName:', fileName)
+      // Get the path of the file, excluding the file name
+      const filePath = path.dirname(fileName);
+      
       // DIRECTLY SEND STRING TO generator.ts
-      const [python_contents, lineNumber, lineIndex] = await writeSqlQueries(fileName);
-      // Remove .py from file name
+      const python_contents = await writeSqlQueries(fileName);
+      // Remove .py from file name and add .ts
       let tfileName = fileName.slice(0, -3)+'.ts';
-      console.log('fileName:', tfileName);
       const baseName = path.basename(tfileName);
-      console.log('baseName:', baseName)
       const tempFilePath = path.join(os.tmpdir(), baseName);
       console.log('tempFilePath:', tempFilePath)
       // Create the temporary file
 
 
       // Write data to the temporary file
-      fs.writeFileSync(tempFilePath, python_contents);
+      // Join the list of strings with newlines
+      const python_contents_str = python_contents.join('\n');
+
+
+      fs.writeFileSync(tempFilePath, python_contents_str);
 
       await this.processTsFile(tempFilePath);
+
+      // Decfilename: original filePath + original file name + _models.py
+      const decsFileName = path.resolve(filePath, `${baseName.slice(0, -3)}_models.py`);
+      // Copy the temporary file to the ACTUAL directory
+      fs.copyFileSync(tempFilePath, decsFileName);
       // Remove the temporary file
       fs.unlinkSync(tempFilePath);
-      await removeSqlQueries(fileName, lineNumber, lineIndex);
+      // Remove the sql query from the python file, so it doesn't get processed again
+      
       
     }
     return this.processTsFile(fileName);
