@@ -10,7 +10,7 @@ def stupid_function():
     # This is a comment which should create a resulting Pydantic model.
     # sql(NAME_OF_THE_MODEL) <"""SQL STATEMENT""">
 
-    #sql(StupidModel)<"""SELECT * FROM books""">#
+    #sql(SelectByNodeID)<"""SELECT * FROM books WHERE node_id = ''""">
 
     pass
 

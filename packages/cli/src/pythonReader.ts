@@ -10,14 +10,12 @@ const outputFilePath = './output.ts'; // Adjust the relative path as needed
 // #sql(NAME)<"""SQL QUERY""">#
 export function writeSqlQueries(filePath: string): string[] {
   let fileContents = fs.readFileSync(filePath, 'utf-8');
-  console.log(filePath);
-  console.log(fileContents);
-
+  
   // Define the regex pattern
   const pattern = /#sql\((.*?)\)<"""(.*?)""">#/gs;
   let match;
   const finalStrings = [];
-
+  console.log('fileContents:', fileContents)
   // Use the regex to match and extract the SQL queries
   while ((match = pattern.exec(fileContents)) !== null) {
       const queryName = match[1];
@@ -29,9 +27,18 @@ export function writeSqlQueries(filePath: string): string[] {
       const final_format = `const ${queryName} =sql\`\n${sqlQuery}\`;\n\n`
       finalStrings.push(final_format);
 
+      // Get the index of the matched string in the file
+      const index = match.index;
+      console.log('index:', index)
+      console.log('match:', match[0])
+
+
       // Replace the SQL query in the file with the string "# Processing {queryName}"
       fileContents = fileContents.replace(match[0], `# Processing ${queryName}`);
+      console.log('fileContents:', fileContents)
+      
   }
+  
 
   // Write the modified file contents back to the file
   fs.writeFileSync(filePath, fileContents, 'utf-8');
