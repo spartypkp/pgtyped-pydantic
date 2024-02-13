@@ -8,6 +8,12 @@ from libcst.metadata import ParentNodeProvider
 # Credit to SeanGrove for the original version of this codemod
 
 class SQLTransformer(cst.CSTTransformer):
+
+    # Add the filename to the context so we can use it in the transformer
+    def __init__(self, filename:str):
+        self.filename = filename
+        self.filename_without_extension = filename.rsplit(".", 1)[0] if "." in filename else filename
+
     def leave_Call(self, node: cst.Call, updated_node: cst.Call):
         if isinstance(node.func, cst.Name) and node.func.value == "sql":
             print("Found sql call")
@@ -19,10 +25,21 @@ class SQLTransformer(cst.CSTTransformer):
 
             
             # CALL PG TYPED HERE!
+
+            # Run the resulting JavaScript file with Node.js
+            
             sql_query = first_arg.value.lstrip('"').rstrip('"')  # Remove the double quotes
-            with open("temp.sql", "w") as f:
+            sql_filename = f"{self.filename_without_extension}.sql"
+            with open(sql_filename, "w") as f:
                 f.write(sql_query)
-            subprocess.run(['npx', 'pgtyped', '--config', 'default_config.json', '--file', 'temp.sql'])
+            print(f"Writing SQL to {sql_filename}")
+            f.close()
+
+            cfg = 'default_config.json'
+            file_override = "./" + sql_filename
+            print(f"Overriding file to {file_override}")
+            # Run index.js, pass default config, DON'T WATCH, and pass the sql file to override to single file mode
+            subprocess.run(['node', '../lib/index.js', '-c', cfg], check=True)
 
             new_args = list(node.args)
             new_args[0] = cst.Arg(value=cst.SimpleString(f'"processed!"'))
@@ -86,7 +103,7 @@ def apply_codemod_to_file(filename: str):
     tree = cst.parse_module(source_code)
 
     # Apply the codemod
-    transformer = SQLTransformer()
+    transformer = SQLTransformer(filename)
     modified_tree = tree.visit(transformer)
 
     print(f"\n\n\n\nModified code:\n{modified_tree.code}")

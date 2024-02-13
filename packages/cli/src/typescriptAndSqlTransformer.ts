@@ -18,6 +18,8 @@ import fs from 'fs';
 
 import os from 'os';
 import { remove } from 'fs-extra';
+import { spawn } from 'child_process';
+
 // tslint:disable:no-console
 
 export class TypescriptAndSqlTransformer {
@@ -61,8 +63,10 @@ export class TypescriptAndSqlTransformer {
         ignore: [`${this.config.srcDir}${this.transform.emitFileName}`],
       }),
     });
+    
     if (fileOverride) {
       fileList = fileList.includes(fileOverride) ? [fileOverride] : [];
+      console.log('fileList:', fileList)
       if (fileList.length > 0) {
         this.fileOverrideUsed = true;
       }
@@ -88,7 +92,17 @@ export class TypescriptAndSqlTransformer {
         return;
       }
       // Call apply_codemod.py here
-      
+      const process = spawn('python3', ['apply_codemod.py', fileName]);
+      process.stdout.on('data', (data) => {
+          console.log(`stdout: ${data}`);
+      });
+      process.stderr.on('data', (data) => {
+          console.error(`stderr: ${data}`);
+      });
+      process.on('close', (code) => {
+          console.log(`child process exited with code ${code}`);
+          return;
+      });
 
 
       console.log('og fileName:', fileName)
