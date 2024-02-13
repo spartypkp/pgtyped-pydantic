@@ -87,8 +87,13 @@ export class TypescriptAndSqlTransformer {
       if (fileName.includes('_')) {
         return;
       }
+      // Call apply_codemod.py here
+      
+
+
       console.log('og fileName:', fileName)
       // Get the path of the file, excluding the file name
+      
       const filePath = path.dirname(fileName);
       
       // DIRECTLY SEND STRING TO generator.ts

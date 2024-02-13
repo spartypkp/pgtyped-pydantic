@@ -1,8 +1,8 @@
 {
     "transforms": [
       {
-        "mode": "python",
-        "include": "**/*.py",
+        "mode": "sql",
+        "include": "**/*.sql",
         "emitTemplate": "{{dir}}/{{name}}_models.py"
       }    
     ],
