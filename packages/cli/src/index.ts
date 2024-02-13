@@ -69,7 +69,8 @@ async function main(
   const connection = new AsyncQueue();
   console.log('starting codegenerator');
   await startup(config.db, connection);
-  
+  console.log(cfg)
+  console.log(fileOverride)
 
   debug('connected to database %o', config.db.dbName);
 
@@ -87,6 +88,7 @@ async function main(
         transform,
       );
       console.log('Starting TypescriptAndSqlTransformer...')
+      console.log('isWatchMode:', isWatchMode)
       return transformer.start(isWatchMode);
     }
   };
@@ -141,7 +143,8 @@ const {
   config: configPath,
   uri: connectionUri,
 } = args;
-
+console.log('Args Providexd to Index.ts:', args)
+console.log('file:', fileOverride)
 if (typeof configPath !== 'string') {
   console.log('Config file required. See help -h for details.\nExiting.');
   process.exit(0);
@@ -157,9 +160,9 @@ try {
     console.log('Config file changed. Exiting.');
     process.exit();
   });
-  console.log(configPath)
+  
   const config = parseConfig(configPath, connectionUri);
-  console.log(config);
+  
   main(config, isWatchMode || false, fileOverride).catch((e) =>
     debug('error in main: %o', e.message),
   );

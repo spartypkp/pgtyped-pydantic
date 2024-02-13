@@ -12,6 +12,6 @@
       },
       "int8": "BigInt.t"    
     },
-    "srcDir": "./src/",
+    "srcDir": "./",
     "dbUrl": "postgres://postgres:password@localhost/postgres"
   }

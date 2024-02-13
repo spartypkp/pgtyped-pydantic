@@ -17,30 +17,53 @@ class SQLTransformer(cst.CSTTransformer):
     def leave_Call(self, node: cst.Call, updated_node: cst.Call):
         if isinstance(node.func, cst.Name) and node.func.value == "sql":
             print("Found sql call")
+            if len(node.args) < 2:
+                raise ValueError("The sql function must have two string arguments.")
             first_arg = node.args[0].value
-            if not isinstance(first_arg, cst.SimpleString):
-                raise ValueError("The first argument to sql must be a string.")
+            second_arg = node.args[1].value
+            if not isinstance(first_arg, cst.SimpleString) or not isinstance(second_arg, cst.SimpleString):
+                raise ValueError("Both arguments to sql must be strings.")
             print(f"First argument to sql: {first_arg.value}")
-
+            print(f"Second argument to sql: {second_arg.value}")
 
             
             # CALL PG TYPED HERE!
 
             # Run the resulting JavaScript file with Node.js
-            
+            function_name = second_arg.value.lstrip('"').rstrip('"')  # Remove the double quotes
             sql_query = first_arg.value.lstrip('"').rstrip('"')  # Remove the double quotes
+
+            # Convert the function_name to correct SQL comment syntax
+            sql_function_name = f"/* @name {function_name} */"
             sql_filename = f"{self.filename_without_extension}.sql"
+
+            # Combine the function name comment and the SQL query
+            sql_named_query = f"{sql_function_name}\n{sql_query}"
+
             with open(sql_filename, "w") as f:
-                f.write(sql_query)
+                f.write(sql_named_query)
             print(f"Writing SQL to {sql_filename}")
             f.close()
 
             cfg = 'default_config.json'
-            file_override = "./" + sql_filename
+            file_override = sql_filename
             print(f"Overriding file to {file_override}")
             # Run index.js, pass default config, DON'T WATCH, and pass the sql file to override to single file mode
-            subprocess.run(['node', '../lib/index.js', '-c', cfg], check=True)
+            # result = subprocess.run(['node', '../lib/index.js', '-c', cfg, '-f', file_override], check=True, capture_output=True, text=True)
+            # print(result.stdout)
 
+            # DEBUGGING SUBPROCESS
+            process = subprocess.Popen(['node', '../lib/index.js', '-c', cfg, '-f', file_override], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            # Print the output in real-time
+            for line in process.stdout:
+                print(line.decode().strip())
+
+            # Wait for the process to finish and get the exit code
+            exit_code = process.wait()
+
+            if exit_code != 0:
+                print(f"Process exited with code {exit_code}")
             new_args = list(node.args)
             new_args[0] = cst.Arg(value=cst.SimpleString(f'"processed!"'))
 
