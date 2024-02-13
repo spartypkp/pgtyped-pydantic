@@ -53,6 +53,7 @@ export class TypescriptAndSqlTransformer {
     if (watch) {
       return this.watch();
     }
+    console.log('Inside transformer.start(). fileOverride:', fileOverride)
 
     /**
      * If the user didn't provide the -f paramter, we're using the list of files we got from glob.

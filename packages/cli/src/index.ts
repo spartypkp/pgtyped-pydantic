@@ -67,8 +67,9 @@ async function main(
 ) {
   const config = await cfg;
   const connection = new AsyncQueue();
-  debug('starting codegenerator');
+  console.log('starting codegenerator');
   await startup(config.db, connection);
+  
 
   debug('connected to database %o', config.db.dbName);
 
@@ -77,6 +78,7 @@ async function main(
   const transformTask = async (transform: TransformConfig) => {
     if (transform.mode === 'ts-implicit') {
       const transformer = new TypedSqlTagTransformer(pool, config, transform);
+      console.log('Starting TypedSqlTagTransformer... ts-implicit mode')
       return transformer.start(isWatchMode);
     } else {
       const transformer = new TypescriptAndSqlTransformer(
@@ -84,6 +86,7 @@ async function main(
         config,
         transform,
       );
+      console.log('Starting TypescriptAndSqlTransformer...')
       return transformer.start(isWatchMode);
     }
   };
@@ -97,6 +100,7 @@ async function main(
         'File override specified, but file was not found in provided transforms',
       );
     }
+    console.log('Shutting down pool');
     await pool.shutdown();
     process.exit(0);
   }
