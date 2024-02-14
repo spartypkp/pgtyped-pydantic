@@ -1,6 +1,6 @@
 {
-  "name": "@pgtyped/parser",
-  "version": "2.3.0",
+  "name": "@pgtyped-pydantic/parser",
+  "version": "0.0.1",
   "type": "module",
   "exports": {
     ".": {
@@ -19,9 +19,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/adelsz/pgtyped.git"
+    "url": "https://github.com/yourusername/pgtyped-pydantic.git"
   },
-  "homepage": "https://github.com/adelsz/pgtyped",
+  "homepage": "https://github.com/yourusername/pgtyped-pydantic",
+  "bugs": {
+    "url": "https://github.com/yourusername/pgtyped-pydantic/issues"
+  },
   "publishConfig": {
     "access": "public"
   },

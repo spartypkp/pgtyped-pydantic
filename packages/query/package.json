@@ -1,6 +1,6 @@
 {
-  "name": "@pgtyped/query",
-  "version": "2.3.0",
+  "name": "@pgtyped-pydantic/query",
+  "version": "0.0.1",
   "type": "module",
   "exports": {
     ".": {
@@ -21,9 +21,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/adelsz/pgtyped.git"
+    "url": "https://github.com/yourusername/pgtyped-pydantic.git"
   },
-  "homepage": "https://github.com/adelsz/pgtyped",
+  "homepage": "https://github.com/yourusername/pgtyped-pydantic",
+  "bugs": {
+    "url": "https://github.com/yourusername/pgtyped-pydantic/issues"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -34,8 +37,8 @@
     "watch": "tsc --watch --preserveWatchOutput"
   },
   "dependencies": {
-    "@pgtyped/runtime": "^2.3.0",
-    "@pgtyped/wire": "^2.3.0",
+    "@pgtyped-pydantic/runtime": "^0.0.0",
+    "@pgtyped-pydantic/wire": "^0.0.0",
     "chalk": "^4.1.0",
     "debug": "^4.1.1"
   },
