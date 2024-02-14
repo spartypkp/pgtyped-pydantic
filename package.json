@@ -1,5 +1,5 @@
 {
-  "name": "pgtyped",
+  "name": "pgtyped-pydantic",
   "version": "0.0.1",
   "main": "index.js",
   "author": "Will Diamond",

@@ -67,7 +67,7 @@ async function main(
 ) {
   const config = await cfg;
   const connection = new AsyncQueue();
-  console.log('starting codegenerator');
+  //console.log('starting codegenerator');
   let output: any = '';
   await startup(config.db, connection);
   //console.log(cfg)
@@ -80,7 +80,7 @@ async function main(
   const transformTask = async (transform: TransformConfig) => {
     if (transform.mode === 'ts-implicit') {
       const transformer = new TypedSqlTagTransformer(pool, config, transform);
-      console.log('Starting TypedSqlTagTransformer... ts-implicit mode')
+      //console.log('Starting TypedSqlTagTransformer... ts-implicit mode')
       return transformer.start(isWatchMode);
     } else {
       const transformer = new TypescriptAndSqlTransformer(
@@ -88,12 +88,12 @@ async function main(
         config,
         transform,
       );
-      console.log('Starting TypescriptAndSqlTransformer...')
-      console.log('isWatchMode:', isWatchMode)
+      //console.log('Starting TypescriptAndSqlTransformer...')
+      //console.log('isWatchMode:', isWatchMode)
 
       output = transformer.start(isWatchMode);
       if (transformer.declarationFileContents !== "") {
-        output = transformer.declarationFileContents;
+        console.log(transformer.declarationFileContents);
       }
        
       return output;
@@ -109,7 +109,7 @@ async function main(
         'File override specified, but file was not found in provided transforms',
       );
     }
-    console.log('Shutting down pool');
+    //console.log('Shutting down pool');
     
     await pool.shutdown();
     console.error(output);
@@ -155,7 +155,7 @@ const {
   uri: connectionUri,
 } = args;
 //console.log('Args Providexd to Index.ts:', args)
-console.log('file:', fileOverride)
+//console.log('file:', fileOverride)
 if (typeof configPath !== 'string') {
   console.log('Config file required. See help -h for details.\nExiting.');
   process.exit(0);
