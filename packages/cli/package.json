@@ -1,6 +1,6 @@
 {
   "name": "@pgtyped-pydantic/cli",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -34,9 +34,9 @@
     "pgtyped-pydantic": "lib/index.js"
   },
   "dependencies": {
-    "@pgtyped-pydantic/parser": "^0.0.0",
-    "@pgtyped-pydantic/query": "^0.0.0",
-    "@pgtyped-pydantic/wire": "^0.0.0",
+    "@pgtyped-pydantic/parser": "file:../parser",
+    "@pgtyped-pydantic/query": "file:../query",
+    "@pgtyped-pydantic/wire": "file:../wire",
     "camel-case": "^4.1.1",
     "chalk": "^4.0.0",
     "chokidar": "^3.3.1",

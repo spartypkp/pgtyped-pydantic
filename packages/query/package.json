@@ -1,6 +1,6 @@
 {
   "name": "@pgtyped-pydantic/query",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "exports": {
     ".": {
@@ -37,8 +37,8 @@
     "watch": "tsc --watch --preserveWatchOutput"
   },
   "dependencies": {
-    "@pgtyped-pydantic/runtime": "^0.0.0",
-    "@pgtyped-pydantic/wire": "^0.0.0",
+    "@pgtyped-pydantic/runtime": "file:../runtime",
+    "@pgtyped-pydantic/wire": "file:../wire",
     "chalk": "^4.1.0",
     "debug": "^4.1.1"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@pgtyped-pydantic/example",
-  "version": "2.3.0",
+  "version": "1.0.0",
   "description": "A package demonstrating how pgtyped works.",
   "author": "Adel Salakh",
   "private": true,
@@ -22,8 +22,8 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@pgtyped-pydantic/cli": "^0.0.0",
-    "@pgtyped-pydantice/query": "^0.0.0",
+    "@pgtyped-pydantic/cli": "file:../cli",
+    "@pgtyped-pydantice/query": "file:../query",
     "expect": "29.7.0",
     "pg": "8.11.3",
     "typescript": "4.9.4"

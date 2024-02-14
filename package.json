@@ -29,7 +29,6 @@
     "typescript": "5.0.4"
   },
   "dependencies": {
-    "@pgtyped-pydantic/runtime": "^0.0.0",
     "io-ts": "^2.1.2"
   }
 }
