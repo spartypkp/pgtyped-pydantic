@@ -86,7 +86,9 @@ export async function processFile({
   transform: TransformConfig;
   
 }): Promise<IWorkerResult> {
- 
+  console.log("INSIDE processFile, worker.ts")
+  console.log('fileName:', fileName)
+  console.log('transform:', transform)
   const ppath = path.parse(fileName) as ExtendedParsedPath;
   ppath.dir_base = path.basename(ppath.dir);
 
@@ -101,20 +103,28 @@ export async function processFile({
   let typeDecSet;
   try {
     typeDecSet = await getTypeDecs({ fileName, transform });
+    console.log("Finished getTypeDecs")
   } catch (e) {
+    console.log("Error in getTypeDecs")
     return {
       error: e,
       relativePath: path.relative(process.cwd(), fileName),
     };
   }
-  const relativePath = path.relative(process.cwd(), decsFileName);
+  const relativePath = decsFileName;
   if (typeDecSet.typedQueries.length > 0) {
+    console.log("Checking if oldDeclarationFileContents !== declarationFileContents")
     const declarationFileContents = await generateDeclarationFile(typeDecSet);
+    console.log("Declaration file contents:", declarationFileContents)
     const oldDeclarationFileContents = (await fs.pathExists(decsFileName))
       ? await fs.readFile(decsFileName, { encoding: 'utf-8' })
       : null;
+    console.log("Old declaration file contents:", oldDeclarationFileContents)
     if (oldDeclarationFileContents !== declarationFileContents) {
-      await fs.outputFile(decsFileName, declarationFileContents);
+      console.log("Writing new declaration file")
+      console.log("decsFileName:", decsFileName)
+      await fs.outputFile(decsFileName, declarationFileContents).catch(console.error);
+      console.log("Finished writing new declaration file")
      
       return {
         skipped: false,
@@ -122,6 +132,7 @@ export async function processFile({
         relativePath,
       };
     }
+
   }
   return {
     skipped: true,

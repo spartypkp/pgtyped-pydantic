@@ -59,8 +59,7 @@ export class TypescriptAndSqlTransformer {
      * If the user didn't provide the -f paramter, we're using the list of files we got from glob.
      * If he did, we're using glob file list to detect if his provided file should be used with this transform.
      */
-    console.log(this.includePattern)
-    console.log(this.transform.emitFileName)
+    
 
     let fileList = globSync(this.includePattern, {
       ...(this.transform.emitFileName && {
@@ -81,13 +80,19 @@ export class TypescriptAndSqlTransformer {
     this.pushToQueue({
       files: fileList,
     });
-
+    console.log(this.workQueue)
+    console.log('awaiting workQueue')
     await Promise.all(this.workQueue);
+    console.log('workQueue done')
     return this.fileOverrideUsed;
   }
 
   private async processFile(fileName: string) {
     fileName = path.relative(process.cwd(), fileName);
+    // If "_sql" not in file name, return
+    if (!fileName.includes('_sql')) {
+      return;
+    }
     console.log(`Processing ${fileName}`);
     const result = (await this.pool.run(
       {
@@ -96,7 +101,7 @@ export class TypescriptAndSqlTransformer {
       },
       'processFile',
     )) as Awaited<processFileFnResult>;
-
+    console.log("result:", result)
     if ('skipped' in result && result.skipped) {
       console.log(`Skipped ${fileName}: no changes or no queries detected`);
     } else if ('error' in result) {

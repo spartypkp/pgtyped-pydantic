@@ -34,19 +34,26 @@ class SQLTransformer(cst.CSTTransformer):
             sql_query = first_arg.value.lstrip('"').rstrip('"')  # Remove the double quotes
 
             # Convert the function_name to correct SQL comment syntax
-            sql_function_name = f"/* @name {function_name} */"
-            sql_filename = f"{self.filename_without_extension}.sql"
+            ts_filename = f"{self.filename_without_extension}.ts"
+
+            
+
 
             # Combine the function name comment and the SQL query
-            sql_named_query = f"{sql_function_name}\n{sql_query}"
+            sql_named_query = f"""
+            import {{ sql }} from '@pgtyped/runtime';
 
-            with open(sql_filename, "w") as f:
+            // Welcome to the worst hack of all time
+
+            const {function_name} =sql`\n{sql_query}`;\n\n"""
+
+            with open(ts_filename, "w") as f:
                 f.write(sql_named_query)
-            print(f"Writing SQL to {sql_filename}")
+            print(f"Writing SQL to {ts_filename}")
             f.close()
 
             cfg = 'default_config.json'
-            file_override = sql_filename
+            file_override = ts_filename
             print(f"Overriding file to {file_override}")
             # Run index.js, pass default config, DON'T WATCH, and pass the sql file to override to single file mode
             # result = subprocess.run(['node', '../lib/index.js', '-c', cfg, '-f', file_override], check=True, capture_output=True, text=True)
