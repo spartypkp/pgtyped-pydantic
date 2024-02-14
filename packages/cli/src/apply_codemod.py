@@ -56,21 +56,21 @@ class SQLTransformer(cst.CSTTransformer):
             file_override = ts_filename
             print(f"Overriding file to {file_override}")
             # Run index.js, pass default config, DON'T WATCH, and pass the sql file to override to single file mode
-            # result = subprocess.run(['node', '../lib/index.js', '-c', cfg, '-f', file_override], check=True, capture_output=True, text=True)
-            # print(result.stdout)
+            result = subprocess.run(['node', '../lib/index.js', '-c', cfg, '-f', file_override], check=True, capture_output=True, text=True)
+            print(result.stdout)
 
-            # DEBUGGING SUBPROCESS
-            process = subprocess.Popen(['node', '../lib/index.js', '-c', cfg, '-f', file_override], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            # # DEBUGGING SUBPROCESS
+            # process = subprocess.Popen(['node', '../lib/index.js', '-c', cfg, '-f', file_override], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-            # Print the output in real-time
-            for line in process.stdout:
-                print(line.decode().strip())
+            # # Print the output in real-time
+            # for line in process.stdout:
+            #     print(line.decode().strip())
 
-            # Wait for the process to finish and get the exit code
-            exit_code = process.wait()
+            # # Wait for the process to finish and get the exit code
+            # exit_code = process.wait()
 
-            if exit_code != 0:
-                print(f"Process exited with code {exit_code}")
+            # if exit_code != 0:
+            #     print(f"Process exited with code {exit_code}")
             new_args = list(node.args)
             new_args[0] = cst.Arg(value=cst.SimpleString(f'"processed!"'))
 

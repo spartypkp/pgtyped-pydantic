@@ -68,6 +68,7 @@ async function main(
   const config = await cfg;
   const connection = new AsyncQueue();
   console.log('starting codegenerator');
+  let output: any = '';
   await startup(config.db, connection);
   //console.log(cfg)
   //console.log(fileOverride)
@@ -89,7 +90,8 @@ async function main(
       );
       console.log('Starting TypescriptAndSqlTransformer...')
       console.log('isWatchMode:', isWatchMode)
-      return transformer.start(isWatchMode);
+      output = transformer.start(isWatchMode);
+      return output;
     }
   };
 
@@ -103,9 +105,12 @@ async function main(
       );
     }
     console.log('Shutting down pool');
+    
     await pool.shutdown();
+    return output;
     process.exit(0);
   }
+
 }
 
 const args = yargs(hideBin(process.argv))

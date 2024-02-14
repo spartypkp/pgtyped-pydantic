@@ -49,7 +49,7 @@ export class TypescriptAndSqlTransformer {
       .on('change', cb);
   }
 
-  public async start(watch: boolean, fileOverride?: string) {
+  public async start(watch: boolean, fileOverride?: string): Promise<string | void> {
     if (watch) {
       return this.watch();
     }
@@ -84,7 +84,7 @@ export class TypescriptAndSqlTransformer {
     console.log('awaiting workQueue')
     await Promise.all(this.workQueue);
     console.log('workQueue done')
-    return this.fileOverrideUsed;
+    return "Fak";
   }
 
   private async processFile(fileName: string) {
@@ -112,6 +112,7 @@ export class TypescriptAndSqlTransformer {
       console.log(
         `Saved ${result.typeDecsLength} query types from ${fileName} to ${result.relativePath}`,
       );
+      return result.declarationFileContents;
     }
   }
 
