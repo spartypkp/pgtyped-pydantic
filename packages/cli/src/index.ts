@@ -90,7 +90,12 @@ async function main(
       );
       console.log('Starting TypescriptAndSqlTransformer...')
       console.log('isWatchMode:', isWatchMode)
+
       output = transformer.start(isWatchMode);
+      if (transformer.declarationFileContents !== "") {
+        output = transformer.declarationFileContents;
+      }
+       
       return output;
     }
   };
@@ -107,8 +112,9 @@ async function main(
     console.log('Shutting down pool');
     
     await pool.shutdown();
-    return output;
+    console.error(output);
     process.exit(0);
+    
   }
 
 }

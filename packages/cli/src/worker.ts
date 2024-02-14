@@ -120,12 +120,12 @@ export async function processFile({
     const oldDeclarationFileContents = (await fs.pathExists(decsFileName))
       ? await fs.readFile(decsFileName, { encoding: 'utf-8' })
       : null;
-    console.log("Old declaration file contents:", oldDeclarationFileContents)
+    //console.log("Old declaration file contents:", oldDeclarationFileContents)
+    console.log("Old functionality: write to file. New fucntionality: return the file contents")
     if (oldDeclarationFileContents !== declarationFileContents) {
-      console.log("Writing new declaration file")
-      console.log("decsFileName:", decsFileName)
-      await fs.outputFile(decsFileName, declarationFileContents).catch(console.log);
-      console.log("Finished writing new declaration file")
+      
+      //await fs.outputFile(decsFileName, declarationFileContents).catch(console.log);
+      
      
       return {
         skipped: false,

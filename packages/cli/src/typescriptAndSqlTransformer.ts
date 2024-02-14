@@ -26,6 +26,7 @@ export class TypescriptAndSqlTransformer {
   public readonly workQueue: Promise<unknown>[] = [];
   private readonly includePattern: string;
   private fileOverrideUsed = false;
+  public declarationFileContents: string = "";
 
   constructor(
     private readonly pool: WorkerPool,
@@ -49,7 +50,7 @@ export class TypescriptAndSqlTransformer {
       .on('change', cb);
   }
 
-  public async start(watch: boolean, fileOverride?: string): Promise<string | void> {
+  public async start(watch: boolean, fileOverride?: string) {
     if (watch) {
       return this.watch();
     }
@@ -80,11 +81,10 @@ export class TypescriptAndSqlTransformer {
     this.pushToQueue({
       files: fileList,
     });
-    console.log(this.workQueue)
-    console.log('awaiting workQueue')
+    
     await Promise.all(this.workQueue);
     console.log('workQueue done')
-    return "Fak";
+    return this.fileOverrideUsed
   }
 
   private async processFile(fileName: string) {
@@ -112,7 +112,7 @@ export class TypescriptAndSqlTransformer {
       console.log(
         `Saved ${result.typeDecsLength} query types from ${fileName} to ${result.relativePath}`,
       );
-      return result.declarationFileContents;
+      this.declarationFileContents = result.declarationFileContents;
     }
   }
 
