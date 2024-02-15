@@ -36,6 +36,7 @@
   "dependencies": {
     "@pgtyped-pydantic/parser": "file:../parser",
     "@pgtyped-pydantic/query": "file:../query",
+    "@pgtyped-pydantic/runtime": "^1.0.0",
     "@pgtyped-pydantic/wire": "file:../wire",
     "camel-case": "^4.1.1",
     "chalk": "^4.0.0",
