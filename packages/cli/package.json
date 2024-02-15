@@ -63,13 +63,5 @@
   "peerDependencies": {
     "typescript": "3.1 - 5"
   },
-  "description": "Forked from pgtyped, please go visit them for the original package! I take no credit for much of this work",
-  "bugs": {
-    "url": "https://github.com/spartypkp/pgtyped-pydantic/issues"
-  },
-  "author": "spartypkp ",
-  "directories": {
-    "lib": "lib",
-    "test": "__tests__"
-  }
+  "description": "Forked from pgtyped, please go visit them for the original package! I take no credit for much of this work"
 }
