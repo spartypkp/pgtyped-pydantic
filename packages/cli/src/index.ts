@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { startup } from '@pgtyped-pydantic/query';
+import { startup } from '../../query';
 import { AsyncQueue } from '@pgtyped-pydantic/wire';
 import chokidar from 'chokidar';
 import nun from 'nunjucks';

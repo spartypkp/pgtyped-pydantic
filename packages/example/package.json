@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@pgtyped-pydantic/cli": "file:../cli",
-    "@pgtyped-pydantice/query": "file:../query",
+    "@pgtyped-pydantic/query": "file:../query",
     "expect": "29.7.0",
     "pg": "8.11.3",
     "typescript": "4.9.4"
