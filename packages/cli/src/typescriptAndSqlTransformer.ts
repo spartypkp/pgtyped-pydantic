@@ -54,7 +54,7 @@ export class TypescriptAndSqlTransformer {
     if (watch) {
       return this.watch();
     }
-    console.log('Inside transformer.start(). fileOverride:', fileOverride)
+    //console.log('Inside transformer.start(). fileOverride:', fileOverride)
 
     /**
      * If the user didn't provide the -f paramter, we're using the list of files we got from glob.
@@ -67,11 +67,11 @@ export class TypescriptAndSqlTransformer {
         ignore: [`${this.config.srcDir}${this.transform.emitFileName}`],
       }),
     });
-    console.log('fileList:', fileList)
+    //console.log('fileList:', fileList)
     
     if (fileOverride) {
       fileList = fileList.includes(fileOverride) ? [fileOverride] : [];
-      console.log('fileList:', fileList)
+      //console.log('fileList:', fileList)
       if (fileList.length > 0) {
         this.fileOverrideUsed = true;
       }
@@ -83,17 +83,19 @@ export class TypescriptAndSqlTransformer {
     });
     
     await Promise.all(this.workQueue);
-    console.log('workQueue done')
+    //console.log('workQueue done')
     return this.fileOverrideUsed
   }
 
   private async processFile(fileName: string) {
     fileName = path.relative(process.cwd(), fileName);
     // If "_sql" not in file name, return
-    if (!fileName.includes('_sql')) {
+    //console.log(`Processing ${fileName}`);
+    if (!fileName.includes('test.ts')) {
       return;
     }
-    console.log(`Processing ${fileName}`);
+    //console.log("Got past the guardian of terrible hacks!")
+    
     const result = (await this.pool.run(
       {
         fileName,
@@ -101,7 +103,7 @@ export class TypescriptAndSqlTransformer {
       },
       'processFile',
     )) as Awaited<processFileFnResult>;
-    console.log("result:", result)
+    //console.log("result:", result)
     if ('skipped' in result && result.skipped) {
       console.log(`Skipped ${fileName}: no changes or no queries detected`);
     } else if ('error' in result) {
@@ -109,9 +111,7 @@ export class TypescriptAndSqlTransformer {
         `Error processing ${fileName}: ${result.error.message}\n${result.error.stack}`,
       );
     } else {
-      console.log(
-        `Saved ${result.typeDecsLength} query types from ${fileName} to ${result.relativePath}`,
-      );
+      //console.log(`Saved ${result.typeDecsLength} query types from ${fileName} to ${result.relativePath}`,);
       this.declarationFileContents = result.declarationFileContents;
     }
   }

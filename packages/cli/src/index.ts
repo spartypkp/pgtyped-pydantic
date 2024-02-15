@@ -30,7 +30,7 @@ export class WorkerPool {
       maxThreads: config.maxWorkerThreads,
       workerData: config,
     });
-    console.log(`Using a pool of ${this.pool.threads.length} threads.`);
+    //console.log(`Using a pool of ${this.pool.threads.length} threads.`);
   }
 
   public async shutdown() {
@@ -93,7 +93,7 @@ async function main(
 
       output = transformer.start(isWatchMode);
       if (transformer.declarationFileContents !== "") {
-        console.log(transformer.declarationFileContents);
+        console.log("#1\n",transformer.declarationFileContents);
       }
        
       return output;
@@ -105,14 +105,12 @@ async function main(
   if (!isWatchMode) {
     const transforms = await Promise.all(tasks);
     if (fileOverride && !transforms.some((x) => x)) {
-      console.log(
-        'File override specified, but file was not found in provided transforms',
-      );
+      //console.log('File override specified, but file was not found in provided transforms',);
     }
     //console.log('Shutting down pool');
     
     await pool.shutdown();
-    console.error(output);
+    
     process.exit(0);
     
   }

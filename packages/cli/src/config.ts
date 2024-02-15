@@ -174,13 +174,13 @@ export function parseConfig(
 ): ParsedConfig {
   const fullPath = isAbsolute(path) ? path : join(process.cwd(), path);
   const configObject = require(fullPath);
-  console.log('configObject:', configObject)
+  //console.log('configObject:', configObject)
   const result = configParser.decode(configObject);
   if (Either.isLeft(result)) {
     const message = reporter(result);
     throw new Error(message[0]);
   }
-  console.log("HERE")
+  //console.log("HERE")
 
   const defaultDBConfig = {
     host: '127.0.0.1',
