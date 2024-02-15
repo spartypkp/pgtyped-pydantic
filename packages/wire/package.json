@@ -11,13 +11,10 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/pgtyped-pydantic.git"
-  },
-  "homepage": "https://github.com/yourusername/pgtyped-pydantic",
+  
+  "homepage": "https://github.com/spartypkp/pgtyped-pydantic",
   "bugs": {
-    "url": "https://github.com/yourusername/pgtyped-pydantic/issues"
+    "url": "https://github.com/spartypkp/pgtyped-pydantic/issues"
   },
   "publishConfig": {
     "access": "public"

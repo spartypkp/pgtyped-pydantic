@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "index.js",
   "author": "Will Diamond",
+  "description": "Generate Pydantic models from Postgres queries. Forked from pgtyped, please go check them out! I take no credit for the amazing original work.",
   "license": "MIT",
   "scripts": {
     "clean": "rm -r packages/*/lib",

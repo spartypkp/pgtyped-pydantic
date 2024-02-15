@@ -19,13 +19,10 @@
     "node": ">=14.16"
   },
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/pgtyped-pydantic.git"
-  },
-  "homepage": "https://github.com/yourusername/pgtyped-pydantic",
+  
+  "homepage": "https://github.com/spartypkp/pgtyped-pydantic",
   "bugs": {
-    "url": "https://github.com/yourusername/pgtyped-pydantic/issues"
+    "url": "https://github.com/spartypkp/pgtyped-pydantic/issues"
   },
   "publishConfig": {
     "access": "public"
@@ -37,8 +34,8 @@
     "watch": "tsc --watch --preserveWatchOutput"
   },
   "dependencies": {
-    "@pgtyped-pydantic/runtime": "file:../runtime",
-    "@pgtyped-pydantic/wire": "file:../wire",
+    "@pgtyped-pydantic/runtime": "^1.0.0",
+    "@pgtyped-pydantic/wire": "^1.0.0",
     "chalk": "^4.1.0",
     "debug": "^4.1.1"
   },

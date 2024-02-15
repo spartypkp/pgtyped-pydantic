@@ -1,8 +1,8 @@
 {
   "name": "@pgtyped-pydantic/example",
   "version": "1.0.0",
-  "description": "A package demonstrating how pgtyped works.",
-  "author": "Adel Salakh",
+  "description": "A package demonstrating how pgtyped works. Forked from pgtyped, please go visit them for the original package! I take no credit for much of this work",
+  "author": "Will Diamond",
   "private": true,
   "homepage": "",
   "license": "MIT",
@@ -22,8 +22,8 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@pgtyped-pydantic/cli": "file:../cli",
-    "@pgtyped-pydantic/query": "file:../query",
+    "@pgtyped-pydantic/cli": "^1.0.0",
+    "@pgtyped-pydantic/query": "^1.0.0",
     "expect": "29.7.0",
     "pg": "8.11.3",
     "typescript": "4.9.4"
