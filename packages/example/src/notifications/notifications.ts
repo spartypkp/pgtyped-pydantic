@@ -1,4 +1,4 @@
-import { sql } from '@pgtyped/runtime';
+import { sql } from '@pgtyped-pydantic/runtime';
 import {
   IInsertNotificationQuery,
   IInsertNotificationsQuery,

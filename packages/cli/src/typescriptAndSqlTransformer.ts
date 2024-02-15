@@ -9,7 +9,7 @@ import { writeSqlQueries} from './pythonReader.js';
 import { write } from 'fs';
 import { TypeAllocator, TypeMapping, TypeScope } from './types.js';
 import worker from 'piscina';
-import { AsyncQueue } from '@pgtyped/wire';
+import { AsyncQueue } from '@pgtyped-pydantic/wire';
 import {
   generateDeclarationFile,
   generateTypedecsFromFile,

@@ -1,4 +1,4 @@
-import { queryASTToIR, parseSQLFile as parseSQLQuery } from '@pgtyped/parser';
+import { queryASTToIR, parseSQLFile as parseSQLQuery } from '@pgtyped-pydantic/parser';
 import { processSQLQueryIR } from './preprocessor-sql.js';
 import { ParameterTransform } from './preprocessor.js';
 

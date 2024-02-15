@@ -1,4 +1,4 @@
-import { ParseEvent, parseTSQuery, TSQueryAST } from '@pgtyped/parser';
+import { ParseEvent, parseTSQuery, TSQueryAST } from '@pgtyped-pydantic/parser';
 import ts from 'typescript';
 import { TransformConfig } from './config.js';
 

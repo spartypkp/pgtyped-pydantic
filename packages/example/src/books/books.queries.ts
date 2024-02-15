@@ -1,5 +1,5 @@
 /** Types generated for queries found in "src/books/books.sql" */
-import { PreparedQuery } from '@pgtyped/runtime';
+import { PreparedQuery } from '@pgtyped-pydantic/runtime';
 
 /** Query 'FindBookById' is invalid, so its result is assigned type 'never'.
  *  */

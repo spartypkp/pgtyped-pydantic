@@ -1,5 +1,5 @@
 /** Types generated for queries found in "src/notifications/notifications.sql" */
-import { PreparedQuery } from '@pgtyped/runtime';
+import { PreparedQuery } from '@pgtyped-pydantic/runtime';
 
 /** Query 'SendNotifications' is invalid, so its result is assigned type 'never'.
  *  */

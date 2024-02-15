@@ -1,4 +1,4 @@
-import { assert, SQLQueryIR, TransformType } from '@pgtyped/parser';
+import { assert, SQLQueryIR, TransformType } from '@pgtyped-pydantic/parser';
 import {
   InterpolatedQuery,
   NestedParameters,
