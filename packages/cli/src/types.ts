@@ -34,6 +34,9 @@ import path from 'path';
 //     'null | boolean | Float | string | Json[] | { [key: string]: Json }',
 // };
 
+// Adding support for pgvector
+
+
 const String: Type = { name: 'str' };
 const Float: Type = { name: 'float' }; // Python's float covers both int and float from TypeScript
 const FloatOrString: Type = {
@@ -110,6 +113,7 @@ export const DefaultTypeMapping = Object.freeze({
   // Extra types
   money: { parameter: String, return: String },
   tsvector: { parameter: String, return: String },
+  vector: { parameter: String, return: String },
   void: { parameter: Void, return: Void },
 
   // JSON types

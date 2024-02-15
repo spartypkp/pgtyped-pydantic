@@ -91,7 +91,7 @@ export class TypescriptAndSqlTransformer {
     fileName = path.relative(process.cwd(), fileName);
     // If "_sql" not in file name, return
     //console.log(`Processing ${fileName}`);
-    if (!fileName.includes('test.ts')) {
+    if (!fileName.includes('_test_')) {
       return;
     }
     //console.log("Got past the guardian of terrible hacks!")
@@ -116,64 +116,7 @@ export class TypescriptAndSqlTransformer {
     }
   }
 
-  // private async processFile(fileName: string) {
-  //   fileName = path.relative(process.cwd(), fileName);
-    
-  //   if (path.extname(fileName) === '.py') {
-  //     // If "_" in file name, return
-  //     if (fileName.includes('_codemod')) {
-  //       return;
-  //     }
-  //     if (fileName.includes('_models')) {
-  //       return;
-  //     }
-  //     if (fileName.includes('_processed')) {
-  //       return;
-  //     }
-  //     console.log("Processing python file with apply_codemod.py", fileName)
-
-  //     // Call apply_codemod.py here
-  //     const process = spawn('python3', ['./src/apply_codemod.py', fileName]);
-  //     process.stdout.on('data', (data) => {
-  //         console.log(`stdout: ${data}`);
-  //     });
-  //     process.stderr.on('data', (data) => {
-  //         console.error(`stderr: ${data}`);
-  //     });
-  //     process.on('close', (code) => {
-  //         console.log(`child process exited with code ${code}`);
-  //         return;
-  //     });
-  //     return;
-      
-      
-  //   }
-  //   console.log(`Processing ${fileName}`);
-  //   return this.processTsFile(fileName);
-  // }
-
-  // private async processTsFile(fileName: string) {
-  //   console.log("Inside processTsFile()")
-  //   const result = (await this.pool.run(
-  //     {
-  //       fileName,
-  //       transform: this.transform,
-  //     },
-  //     'processFile',
-  //   )) as Awaited<processFileFnResult>;
   
-  //   if ('skipped' in result && result.skipped) {
-  //     console.log(`Skipped ${fileName}: no changes or no queries detected`);
-  //   } else if ('error' in result) {
-  //     console.error(
-  //       `Error processing ${fileName}: ${result.error.message}\n${result.error.stack}`,
-  //     );
-  //   } else {
-  //     console.log(
-  //       `Saved ${result.typeDecsLength} query types from ${fileName} to ${result.relativePath}`,
-  //     );
-  //   }
-  // }
 
   public pushToQueue(job: TransformJob) {
     this.workQueue.push(
