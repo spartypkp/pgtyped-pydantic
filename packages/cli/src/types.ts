@@ -7,9 +7,9 @@ import {
   isImport,
   MappableType,
   Type,
-} from '../../query';
+} from '@pgtyped-pydantic/query';
 import os from 'os';
-import { AliasedType, EnumType } from '../../query/lib/type.js';
+import { AliasedType, EnumType } from '@pgtyped-pydantic/query/lib/type.js';
 import path from 'path';
 
 

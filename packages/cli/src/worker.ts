@@ -1,4 +1,4 @@
-import { startup } from '../../query';
+import { startup } from '@pgtyped-pydantic/query';
 import { AsyncQueue } from '@pgtyped-pydantic/wire';
 import fs from 'fs-extra';
 import nun from 'nunjucks';

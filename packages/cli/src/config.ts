@@ -1,6 +1,6 @@
 /** @fileoverview Config file parser */
 
-import { Type } from '../../query';
+import { Type } from '@pgtyped-pydantic/query';
 import * as Either from 'fp-ts/lib/Either.js';
 import * as t from 'io-ts';
 import { reporter } from 'io-ts-reporters';

@@ -7,7 +7,7 @@ import {
   TSQueryAST,
 } from '@pgtyped-pydantic/parser';
 
-import { getTypes, TypeSource } from '../../query';
+import { getTypes, TypeSource } from '@pgtyped-pydantic/query';
 import {
   ParameterTransform,
   processSQLQueryIR,
@@ -19,7 +19,7 @@ import path from 'path';
 import { ParsedConfig, TransformConfig } from './config.js';
 import { parseCode as parseTypescriptFile } from './parseTypescript.js';
 import { TypeAllocator, TypeDefinitions, TypeScope } from './types.js';
-import { IQueryTypes } from '../../query/lib/actions.js';
+import { IQueryTypes } from '@pgtyped-pydantic/query/lib/actions.js';
 
 export enum ProcessingMode {
   SQL = 'sql-file',
