@@ -10,10 +10,6 @@
     }
   },
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/spartypkp/pgtyped-pydantic.git"
-  },
   "files": [
     "lib"
   ],

@@ -1,6 +1,6 @@
 {
   "name": "pgtyped-pydantic",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "index.js",
   "author": "Will Diamond",
   "description": "Generate Pydantic models from Postgres queries. Forked from pgtyped, please go check them out! I take no credit for the amazing original work.",
