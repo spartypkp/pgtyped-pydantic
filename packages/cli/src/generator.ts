@@ -96,7 +96,7 @@ export const generateModel = (modelName: string, fields: IField[]) => {
 };
 // Converted to use Python typing modules' NewType
 export const generateTypeAlias = (typeName: string, alias: string) => {
-  if (typeName === 'None') {
+  if (alias === 'None') {
     return `${typeName} = None\n\n`;
   } else {
     return `${typeName} = NewType('${typeName}', ${alias})\n\n`;
