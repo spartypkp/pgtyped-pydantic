@@ -417,7 +417,7 @@ export function generateDeclarationFile(typeDecSet: TypeDeclarationSet){
 
   let content = `# Pydantic models generated for queries found in "${stableFilePath}"\n`;
   content += 'from pydantic import BaseModel, Field\n';
-  content += 'from typing import Optional, List, Any, Dict, Union, \n\n';
+  content += 'from typing import Optional, List, Any, Dict, Union \n\n';
   content += 'from typing_extensions import NewType\n\n';
   content += 'from datetime import datetime\n\n';
   
