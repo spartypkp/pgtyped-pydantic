@@ -49,6 +49,26 @@ export function escapeKey(key: string) {
   }
   return `"${key}"`;
 }
+// Keep this here in case I need to revert
+// export const generateModel = (modelName: string, fields: IField[]) => {
+//   const sortedFields = fields
+//     .slice()
+//     .sort((a, b) => a.fieldName.localeCompare(b.fieldName));
+//   const contents = sortedFields
+//     .map(({ fieldName, fieldType, comment, optional }) => {
+//       const lines = [];
+//       if (comment) {
+//         lines.push(`  # ${escapeComment(comment)} `);
+//       }
+      
+//       const paramSuffix = optional ? ' = None' : '';
+//       const entryLine = `  ${escapeKey(fieldName)}${paramSuffix}: ${fieldType}`;
+//       lines.push(entryLine);
+//       return lines.join('\n');
+//     })
+//     .join('\n');
+//   return interfaceGen(modelName, contents);
+// };
 
 export const generateModel = (modelName: string, fields: IField[]) => {
   const sortedFields = fields
@@ -56,6 +76,10 @@ export const generateModel = (modelName: string, fields: IField[]) => {
     .sort((a, b) => a.fieldName.localeCompare(b.fieldName));
   const contents = sortedFields
     .map(({ fieldName, fieldType, comment, optional }) => {
+      if (fieldType === 'None') {
+        return '';
+      }
+      
       const lines = [];
       if (comment) {
         lines.push(`  # ${escapeComment(comment)} `);
@@ -66,12 +90,18 @@ export const generateModel = (modelName: string, fields: IField[]) => {
       lines.push(entryLine);
       return lines.join('\n');
     })
+    .filter(Boolean)
     .join('\n');
   return interfaceGen(modelName, contents);
 };
 // Converted to use Python typing modules' NewType
-export const generateTypeAlias = (typeName: string, alias: string) =>
-  `${typeName} = NewType('${typeName}', ${alias})\n\n`;
+export const generateTypeAlias = (typeName: string, alias: string) => {
+  if (typeName === 'None') {
+    return `${typeName} = None\n\n`;
+  } else {
+    return `${typeName} = NewType('${typeName}', ${alias})\n\n`;
+  }
+};
 
 // TODO: Convert
 type ParsedQuery =
