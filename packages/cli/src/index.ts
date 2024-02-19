@@ -88,15 +88,8 @@ async function main(
         config,
         transform,
       );
-      //console.log('Starting TypescriptAndSqlTransformer...')
-      //console.log('isWatchMode:', isWatchMode)
-
-      output = transformer.start(isWatchMode);
-      if (transformer.declarationFileContents !== "") {
-        console.log("#1\n",transformer.declarationFileContents);
-      }
        
-      return output;
+      return transformer.start(isWatchMode);
     }
   };
 

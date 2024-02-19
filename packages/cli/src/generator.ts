@@ -262,26 +262,35 @@ export async function queryToPydanticDeclarations(
   // code
   // tslint:disable-next-line:no-console
   types.errors.forEach((err) => console.log(err));
+  
+  
 
-  const resultModelName = `${interfacePrefix}${modelName}Result`;
-  const returnTypesModel =
-    `""" '${queryName}' return type """\n` +
-    (returnFieldTypes.length > 0
-      ? generateModel(
-          `${interfacePrefix}${modelName}Result`,
-          returnFieldTypes,
-        )
-      : generateTypeAlias(resultModelName, 'None'));
+  let resultModelName = `${interfacePrefix}${modelName}Result`;
+  let returnTypesModel = `""" '${queryName}' return type """\n`;
 
-  const paramModelName = `${interfacePrefix}${modelName}Params`;
-  const paramTypesModel =
-    `""" '${queryName}' parameters type """\n` +
-    (paramFieldTypes.length > 0
-      ? generateModel(
-          `${interfacePrefix}${modelName}Params`,
-          paramFieldTypes,
-        )
-      : generateTypeAlias(paramModelName, 'None'));
+  if (returnFieldTypes.length > 0) {
+    returnTypesModel += generateModel(
+      `${interfacePrefix}${modelName}Result`,
+      returnFieldTypes,
+    );
+  } else {
+    returnTypesModel += generateTypeAlias(resultModelName, 'None');
+    resultModelName = 'None';
+  }
+
+  let paramModelName = `${interfacePrefix}${modelName}Params`;
+  let paramTypesModel = `""" '${queryName}' parameters type """\n`;
+
+  if (paramFieldTypes.length > 0) {
+    paramTypesModel += generateModel(
+      `${interfacePrefix}${modelName}Params`,
+      paramFieldTypes,
+    );
+  } else {
+    paramTypesModel += generateTypeAlias(paramModelName, 'None');
+    paramModelName = 'None';
+  }
+  
 
   const typePairInterface =
     `""" '${queryName}' query type """\n` +
@@ -289,6 +298,7 @@ export async function queryToPydanticDeclarations(
       { fieldName: 'params', fieldType: paramModelName },
       { fieldName: 'result', fieldType: resultModelName },
     ]);
+
 
   return [paramTypesModel, returnTypesModel, typePairInterface].join(
     '',

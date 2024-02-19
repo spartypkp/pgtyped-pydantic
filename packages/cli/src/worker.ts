@@ -29,7 +29,6 @@ export type IWorkerResult =
       skipped: boolean;
       typeDecsLength: number;
       relativePath: string;
-      declarationFileContents: string;
     }
   | {
       error: any;
@@ -87,9 +86,7 @@ export async function processFile({
   transform: TransformConfig;
   
 }): Promise<IWorkerResult> {
-  //console.log("INSIDE processFile, worker.ts")
-  //console.log('fileName:', fileName)
-  //console.log('transform:', transform)
+  
   const ppath = path.parse(fileName) as ExtendedParsedPath;
   ppath.dir_base = path.basename(ppath.dir);
 
@@ -117,22 +114,20 @@ export async function processFile({
     //console.log("Checking if oldDeclarationFileContents !== declarationFileContents")
     const declarationFileContents = await generateDeclarationFile(typeDecSet);
     
-    console.log(declarationFileContents)
-    const oldDeclarationFileContents = (await fs.pathExists(decsFileName))
-      ? await fs.readFile(decsFileName, { encoding: 'utf-8' })
+    //console.log(declarationFileContents)
+    // Get the declaration filename without suffix, and add _models.py
+    const decsFileNamePython = decsFileName.replace(/.ts$/, '_models.py'); 
+    const oldDeclarationFileContents = (await fs.pathExists(decsFileNamePython))
+      ? await fs.readFile(decsFileNamePython, { encoding: 'utf-8' })
       : null;
     //console.log("Old declaration file contents:", oldDeclarationFileContents)
     //console.log("Old functionality: write to file. New fucntionality: return the file contents")
     if (oldDeclarationFileContents !== declarationFileContents) {
-      
-      //await fs.outputFile(decsFileName, declarationFileContents).catch(console.log);
-      
-     
+      await fs.outputFile(decsFileNamePython, declarationFileContents);
       return {
         skipped: false,
         typeDecsLength: typeDecSet.typedQueries.length,
         relativePath,
-        declarationFileContents,
       };
     }
 
@@ -140,8 +135,7 @@ export async function processFile({
   return {
     skipped: true,
     typeDecsLength: 0,
-    relativePath,
-    declarationFileContents: '',
+    relativePath
   };
 }
 
