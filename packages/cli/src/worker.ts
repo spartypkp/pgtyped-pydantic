@@ -29,6 +29,7 @@ export type IWorkerResult =
       skipped: boolean;
       typeDecsLength: number;
       relativePath: string;
+      declarationFileContents?: string;
     }
   | {
       error: any;
@@ -123,11 +124,12 @@ export async function processFile({
     //console.log("Old declaration file contents:", oldDeclarationFileContents)
     //console.log("Old functionality: write to file. New fucntionality: return the file contents")
     if (oldDeclarationFileContents !== declarationFileContents) {
-      await fs.outputFile(decsFileNamePython, declarationFileContents);
+      
       return {
         skipped: false,
         typeDecsLength: typeDecSet.typedQueries.length,
         relativePath,
+        declarationFileContents,
       };
     }
 

@@ -112,7 +112,10 @@ export class TypescriptAndSqlTransformer {
       );
     } else {
       //console.log(`Saved ${result.typeDecsLength} query types from ${fileName} to ${result.relativePath}`,);
-      this.declarationFileContents = result.declarationFileContents;
+      if (result.declarationFileContents) {
+        console.log(result.declarationFileContents)
+      }
+      
     }
   }
 
