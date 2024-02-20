@@ -90,7 +90,7 @@ export class TypescriptAndSqlTransformer {
   private async processFile(fileName: string) {
     fileName = path.relative(process.cwd(), fileName);
     // If "_sql" not in file name, return
-    //console.log(`Processing ${fileName}`);
+    console.log(`Processing ${fileName}`);
     if (!fileName.includes('_test_')) {
       return;
     }
@@ -103,7 +103,7 @@ export class TypescriptAndSqlTransformer {
       },
       'processFile',
     )) as Awaited<processFileFnResult>;
-    //console.log("result:", result)
+    console.log("result:", result)
     if ('skipped' in result && result.skipped) {
       console.log(`Skipped ${fileName}: no changes or no queries detected`);
     } else if ('error' in result) {
@@ -112,10 +112,7 @@ export class TypescriptAndSqlTransformer {
       );
     } else {
       //console.log(`Saved ${result.typeDecsLength} query types from ${fileName} to ${result.relativePath}`,);
-      if (result.declarationFileContents) {
-        console.log(result.declarationFileContents)
-      }
-      
+      console.log(result.declarationFileContents)
     }
   }
 
