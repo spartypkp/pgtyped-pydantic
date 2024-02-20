@@ -34,7 +34,7 @@ export interface IField {
 }
 
 const interfaceGen = (modelName: string, contents: string) =>
-  `class ${modelName} (BaseModel):
+  `\tclass ${modelName} (BaseModel):
 ${contents}
 \n\n`;
 
@@ -62,11 +62,11 @@ export const generateModel = (modelName: string, fields: IField[]) => {
       
       const lines = [];
       if (comment) {
-        lines.push(`  # ${escapeComment(comment)} `);
+        lines.push(`\t  # ${escapeComment(comment)} `);
       }
       
       const paramSuffix = optional ? ' = None' : '';
-      const entryLine = `  ${escapeKey(fieldName)}${paramSuffix}: ${fieldType}`;
+      const entryLine = `\t  ${escapeKey(fieldName)}${paramSuffix}: ${fieldType}`;
       lines.push(entryLine);
       return lines.join('\n');
     })
@@ -149,8 +149,8 @@ export async function queryToPydanticDeclarations(
       `${modelName}Params`,
       'Any',
     );
-    const resultErrorComment = `# Query '${queryName}' is invalid, so its result is assigned type 'Any'.\n * ${explanation} */\n`;
-    const paramErrorComment = `# Query '${queryName}' is invalid, so its parameters are assigned type 'Any'.\n * ${explanation} */\n`;
+    const resultErrorComment = `\t# Query '${queryName}' is invalid, so its result is assigned type 'Any'.\n * ${explanation} */\n`;
+    const paramErrorComment = `\t# Query '${queryName}' is invalid, so its parameters are assigned type 'Any'.\n * ${explanation} */\n`;
     return `${resultErrorComment}${returnModel}${paramErrorComment}${paramModel}`;
   }
 
@@ -222,8 +222,8 @@ export async function queryToPydanticDeclarations(
             TypeScope.Parameter,
           );
           return p.required
-            ? `    ${p.name}: ${paramType}`
-            : `    ${p.name}: Optional[${paramType}]`;
+            ? `\t    ${p.name}: ${paramType}`
+            : `\t    ${p.name}: Optional[${paramType}]`;
         })
         .join(',\n');
       fieldType = `\n${fieldType}\n  `;
@@ -246,7 +246,7 @@ export async function queryToPydanticDeclarations(
   
   
   let resultModelName = `${interfacePrefix}${modelName}Result`;
-  let returnTypesModel = `""" '${queryName}' return type """\n`;
+  let returnTypesModel = `\t""" '${queryName}' return type """\n`;
 
   if (returnFieldTypes.length > 0) {
     returnTypesModel += generateModel(
@@ -261,7 +261,7 @@ export async function queryToPydanticDeclarations(
 
 
   let paramModelName = `${interfacePrefix}${modelName}Params`;
-  let paramTypesModel = `""" '${queryName}' parameters type """\n`;
+  let paramTypesModel = `\t""" '${queryName}' parameters type """\n`;
 
   if (paramFieldTypes.length > 0) {
     paramTypesModel += generateModel(
@@ -275,7 +275,7 @@ export async function queryToPydanticDeclarations(
   
 
   const typePairInterface =
-    `""" '${queryName}' query type """\n` +
+    `\t""" '${queryName}' query type """\n` +
     generateModel(`${interfacePrefix}${modelName}Query`, [
       { fieldName: 'params', fieldType: paramModelName },
       { fieldName: 'result', fieldType: resultModelName },
