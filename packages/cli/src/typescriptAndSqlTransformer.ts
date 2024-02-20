@@ -91,9 +91,7 @@ export class TypescriptAndSqlTransformer {
     fileName = path.relative(process.cwd(), fileName);
     // If "_sql" not in file name, return
     console.log(`Processing ${fileName}`);
-    if (!fileName.includes('_test_')) {
-      return;
-    }
+    
     //console.log("Got past the guardian of terrible hacks!")
     
     const result = (await this.pool.run(
