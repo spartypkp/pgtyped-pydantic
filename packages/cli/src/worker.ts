@@ -114,24 +114,25 @@ export async function processFile({
   if (typeDecSet.typedQueries.length > 0) {
     //console.log("Checking if oldDeclarationFileContents !== declarationFileContents")
     const declarationFileContents = await generateDeclarationFile(typeDecSet);
+    console.log("declarationFileContents in worker.ts:", declarationFileContents)
     
     //console.log(declarationFileContents)
     // Get the declaration filename without suffix, and add _models.py
-    const decsFileNamePython = decsFileName.replace(/.ts$/, '_models.py'); 
-    const oldDeclarationFileContents = (await fs.pathExists(decsFileNamePython))
-      ? await fs.readFile(decsFileNamePython, { encoding: 'utf-8' })
-      : null;
+    // const decsFileNamePython = decsFileName.replace(/.ts$/, '_models.py'); 
+    // const oldDeclarationFileContents = (await fs.pathExists(decsFileNamePython))
+    //   ? await fs.readFile(decsFileNamePython, { encoding: 'utf-8' })
+    //   : null;
     //console.log("Old declaration file contents:", oldDeclarationFileContents)
     //console.log("Old functionality: write to file. New fucntionality: return the file contents")
-    if (oldDeclarationFileContents !== declarationFileContents) {
+    
       
-      return {
-        skipped: false,
-        typeDecsLength: typeDecSet.typedQueries.length,
-        relativePath,
-        declarationFileContents,
-      };
-    }
+    return {
+      skipped: false,
+      typeDecsLength: typeDecSet.typedQueries.length,
+      relativePath,
+      declarationFileContents,
+    };
+    
 
   }
   return {
