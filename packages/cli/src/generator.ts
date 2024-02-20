@@ -34,7 +34,7 @@ export interface IField {
 }
 
 const interfaceGen = (modelName: string, contents: string) =>
-  `\tclass ${modelName} (BaseModel):
+  `class ${modelName} (BaseModel):
 ${contents}
 \n\n`;
 
@@ -60,11 +60,11 @@ export const generateModel = (modelName: string, fields: IField[]) => {
       
       const lines = [];
       if (comment) {
-        lines.push(`\t  # ${escapeComment(comment)} `);
+        lines.push(`  # ${escapeComment(comment)} `);
       }
       
       const paramSuffix = optional ? ' = None' : '';
-      const entryLine = `\t  ${escapeKey(fieldName)}${paramSuffix}: ${fieldType}`;
+      const entryLine = `${escapeKey(fieldName)}${paramSuffix}: ${fieldType}`;
       lines.push(entryLine);
       return lines.join('\n');
     })
@@ -75,7 +75,7 @@ export const generateModel = (modelName: string, fields: IField[]) => {
 // Converted to use Python typing modules' NewType
 export const generateTypeAlias = (typeName: string, alias: string) => {
   
-  return `\t${typeName} = NewType('${typeName}', ${alias})\n\n`;
+  return `${typeName} = NewType('${typeName}', ${alias})\n\n`;
   
 };
 
@@ -145,8 +145,8 @@ export async function queryToPydanticDeclarations(
       `${modelName}Params`,
       'Any',
     );
-    const resultErrorComment = `\t# Query '${queryName}' is invalid, so its result is assigned type 'Any'.\n * ${explanation} */\n`;
-    const paramErrorComment = `\t# Query '${queryName}' is invalid, so its parameters are assigned type 'Any'.\n * ${explanation} */\n`;
+    const resultErrorComment = `# Query '${queryName}' is invalid, so its result is assigned type 'Any'.\n * ${explanation} */\n`;
+    const paramErrorComment = `# Query '${queryName}' is invalid, so its parameters are assigned type 'Any'.\n * ${explanation} */\n`;
     return `${resultErrorComment}${returnModel}${paramErrorComment}${paramModel}`;
   }
 
@@ -414,37 +414,37 @@ export function generateDeclarations(typedQueries: TypedQuery[]): string {
 
     let python_class_structure = `
 class ${typedQuery.query.name}:
-\t""" 
-\tClass to hold all pydantic models for a single SQL query.
-\tDefined by SQL invocation in ${pythonFilename}.
-\tOriginal SQL: "${sqlQuery}"
-\tUsed in files: []
-\t"""
+""" 
+Class to hold all pydantic models for a single SQL query.
+Defined by SQL invocation in ${pythonFilename}.
+Original SQL: "${sqlQuery}"
+Used in files: []
+"""
 
 ${pydanticModel}
 
-\t@property
-\tdef params(self) -> ${typedQuery.query.paramTypeAlias}:
-\t\t"""
-\t\tProperty for accessing the parameters of the SQL invocation.
-\t\t"""
-\t\treturn ${typedQuery.query.paramTypeAlias}
+@property
+def params(self) -> ${typedQuery.query.paramTypeAlias}:
+"""
+Property for accessing the parameters of the SQL invocation.
+"""
+return ${typedQuery.query.paramTypeAlias}
 
 
 
-\t@property
-\tdef returns(self) -> ${typedQuery.query.returnTypeAlias}:
-\t\t"""
-\t\tPropery for accessing the return type of the SQL invocation.
-\t\t"""
-\t\treturn ${typedQuery.query.returnTypeAlias}
+@property
+def returns(self) -> ${typedQuery.query.returnTypeAlias}:
+"""
+Propery for accessing the return type of the SQL invocation.
+"""
+return ${typedQuery.query.returnTypeAlias}
 
 
-\tdef run(self, params: ${typedQuery.query.paramTypeAlias}) -> List[${typedQuery.query.returnTypeAlias}]:
-\t\t""" 
-\t\tMethod to run the sql query.
-\t\t"""
-\t\treturn []
+def run(self, params: ${typedQuery.query.paramTypeAlias}) -> List[${typedQuery.query.returnTypeAlias}]:
+""" 
+Method to run the sql query.
+"""
+return []
 
 ### EOF ###`;
     pydanticModels += python_class_structure;
@@ -469,15 +469,15 @@ export function generateDeclarationFile(typeDecSet: TypeDeclarationSet){
   return content;
 }
 
-export function genTypedSQLOverloadFunctions(
-  functionName: string,
-  typedQueries: TSTypedQuery[],
-) {
-  return typedQueries
-    .map(
-      (typeDec) =>
-        `class ${functionName}(BaseModel):\n    query: Literal["${typeDec.query.ast.text}"]\n    result: ${typeDec.query.queryTypeAlias}\n`,
-    )
-    .filter((s) => s)
-    .join('\n');
-}
+// export function genTypedSQLOverloadFunctions(
+//   functionName: string,
+//   typedQueries: TSTypedQuery[],
+// ) {
+//   return typedQueries
+//     .map(
+//       (typeDec) =>
+//         `class ${functionName}(BaseModel):\n    query: Literal["${typeDec.query.ast.text}"]\n    result: ${typeDec.query.queryTypeAlias}\n`,
+//     )
+//     .filter((s) => s)
+//     .join('\n');
+// }
