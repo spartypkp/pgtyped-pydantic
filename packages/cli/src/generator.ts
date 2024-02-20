@@ -56,9 +56,7 @@ export const generateModel = (modelName: string, fields: IField[]) => {
     .sort((a, b) => a.fieldName.localeCompare(b.fieldName));
   const contents = sortedFields
     .map(({ fieldName, fieldType, comment, optional }) => {
-      if (fieldType === 'None') {
-        return '';
-      }
+      
       
       const lines = [];
       if (comment) {
@@ -76,11 +74,9 @@ export const generateModel = (modelName: string, fields: IField[]) => {
 };
 // Converted to use Python typing modules' NewType
 export const generateTypeAlias = (typeName: string, alias: string) => {
-  if (alias === 'None') {
-    return `${typeName} = None\n\n`;
-  } else {
-    return `${typeName} = NewType('${typeName}', ${alias})\n\n`;
-  }
+  
+  return `\t${typeName} = NewType('${typeName}', ${alias})\n\n`;
+  
 };
 
 // TODO: Convert
@@ -416,40 +412,41 @@ export function generateDeclarations(typedQueries: TypedQuery[]): string {
     const pythonFilename = typedQuery.fileName.replace("_temp.sql", ".py");
     const sqlQuery = typedQuery.query.ir.statement;
 
-    let python_class_structure = `class ${typedQuery.query.name}:
-    """ 
-    Class to hold all pydantic models for a single SQL query.
-    Defined by SQL invocation in ${pythonFilename}.
-    Original SQL: "${sqlQuery}"
-    Used in files: []
-    """
+    let python_class_structure = `
+class ${typedQuery.query.name}:
+\t""" 
+\tClass to hold all pydantic models for a single SQL query.
+\tDefined by SQL invocation in ${pythonFilename}.
+\tOriginal SQL: "${sqlQuery}"
+\tUsed in files: []
+\t"""
 
-    ${pydanticModel}
-   
-    @property
-    def params(self) -> ${typedQuery.query.paramTypeAlias}:
-    """
-    Property for accessing the parameters of the SQL invocation.
-    """
-        return ${typedQuery.query.paramTypeAlias}
-    
+${pydanticModel}
 
-    
-    @property
-    def returns(self) -> ${typedQuery.query.returnTypeAlias}:
-    """
-    Propery for accessing the return type of the SQL invocation.
-    """
-        return ${typedQuery.query.returnTypeAlias}
-    
+\t@property
+\tdef params(self) -> ${typedQuery.query.paramTypeAlias}:
+\t\t"""
+\t\tProperty for accessing the parameters of the SQL invocation.
+\t\t"""
+\t\treturn ${typedQuery.query.paramTypeAlias}
 
-    def run(self, params: ${typedQuery.query.paramTypeAlias}) -> List[${typedQuery.query.returnTypeAlias}]:
-        """ 
-        Method to run the sql query.
-        """
-        return []
 
-    *** EOF ***`;
+
+\t@property
+\tdef returns(self) -> ${typedQuery.query.returnTypeAlias}:
+\t\t"""
+\t\tPropery for accessing the return type of the SQL invocation.
+\t\t"""
+\t\treturn ${typedQuery.query.returnTypeAlias}
+
+
+\tdef run(self, params: ${typedQuery.query.paramTypeAlias}) -> List[${typedQuery.query.returnTypeAlias}]:
+\t\t""" 
+\t\tMethod to run the sql query.
+\t\t"""
+\t\treturn []
+
+### EOF ###`;
     pydanticModels += python_class_structure;
   }
   return pydanticModels;
