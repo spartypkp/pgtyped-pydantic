@@ -49,26 +49,6 @@ export function escapeKey(key: string) {
   }
   return `"${key}"`;
 }
-// Keep this here in case I need to revert
-// export const generateModel = (modelName: string, fields: IField[]) => {
-//   const sortedFields = fields
-//     .slice()
-//     .sort((a, b) => a.fieldName.localeCompare(b.fieldName));
-//   const contents = sortedFields
-//     .map(({ fieldName, fieldType, comment, optional }) => {
-//       const lines = [];
-//       if (comment) {
-//         lines.push(`  # ${escapeComment(comment)} `);
-//       }
-      
-//       const paramSuffix = optional ? ' = None' : '';
-//       const entryLine = `  ${escapeKey(fieldName)}${paramSuffix}: ${fieldType}`;
-//       lines.push(entryLine);
-//       return lines.join('\n');
-//     })
-//     .join('\n');
-//   return interfaceGen(modelName, contents);
-// };
 
 export const generateModel = (modelName: string, fields: IField[]) => {
   const sortedFields = fields
@@ -264,7 +244,7 @@ export async function queryToPydanticDeclarations(
   types.errors.forEach((err) => console.log(err));
   
   
-
+  
   let resultModelName = `${interfacePrefix}${modelName}Result`;
   let returnTypesModel = `""" '${queryName}' return type """\n`;
 
@@ -277,6 +257,8 @@ export async function queryToPydanticDeclarations(
     returnTypesModel += generateTypeAlias(resultModelName, 'None');
     resultModelName = 'None';
   }
+
+
 
   let paramModelName = `${interfacePrefix}${modelName}Params`;
   let paramTypesModel = `""" '${queryName}' parameters type """\n`;
@@ -425,22 +407,50 @@ export async function generateTypedecsFromFile(
 
 export function generateDeclarations(typedQueries: TypedQuery[]): string {
   let pydanticModels = '';
+  let pydanticModel = '';
   for (const typedQuery of typedQueries) {
-    pydanticModels += typedQuery.pydanticModel;
+    pydanticModel = typedQuery.pydanticModel;
     if (typedQuery.mode === 'ts') {
       continue;
     }
-    const queryPP = typedQuery.query.ast.statement.body
-      .split('\n')
-      .map((s: string) => ' # ' + s)
-      .join('\n');
-    pydanticModels += `# Query generated from SQL:\n` +
-      `# \`\`\`\n` +
-      ` ${queryPP}\n` +
-      `# \`\`\`\n`;
-    pydanticModels += `class ${typedQuery.query.name}(BaseModel):\n` +
-      `    params: ${typedQuery.query.paramTypeAlias}\n` +
-      `    result: ${typedQuery.query.returnTypeAlias}\n\n\n`;
+    const pythonFilename = typedQuery.fileName.replace("_temp.sql", ".py");
+    const sqlQuery = typedQuery.query.ir.statement;
+
+    let python_class_structure = `class ${typedQuery.query.name}:
+    """ 
+    Class to hold all pydantic models for a single SQL query.
+    Defined by SQL invocation in ${pythonFilename}.
+    Original SQL: "${sqlQuery}"
+    Used in files: []
+    """
+
+    ${pydanticModel}
+   
+    @property
+    def params(self) -> ${typedQuery.query.paramTypeAlias}:
+    """
+    Property for accessing the parameters of the SQL invocation.
+    """
+        return ${typedQuery.query.paramTypeAlias}
+    
+
+    
+    @property
+    def returns(self) -> ${typedQuery.query.returnTypeAlias}:
+    """
+    Propery for accessing the return type of the SQL invocation.
+    """
+        return ${typedQuery.query.returnTypeAlias}
+    
+
+    def run(self, params: ${typedQuery.query.paramTypeAlias}) -> List[${typedQuery.query.returnTypeAlias}]:
+        """ 
+        Method to run the sql query.
+        """
+        return []
+
+    *** EOF ***`;
+    pydanticModels += python_class_structure;
   }
   return pydanticModels;
 }
@@ -455,13 +465,9 @@ export function generateDeclarationFile(typeDecSet: TypeDeclarationSet){
     ? typeDecSet.fileName.replace(/\\/g, '/')
     : typeDecSet.fileName;
 
-  let content = `# Pydantic models generated for queries found in "${stableFilePath}"\n`;
-  content += 'from pydantic import BaseModel, Field\n';
-  content += 'from typing import Optional, List, Any, Dict, Union \n\n';
-  content += 'from typing_extensions import NewType\n\n';
-  content += 'from datetime import datetime\n\n';
   
-  content += generateDeclarations(typeDecSet.typedQueries);
+  
+  const content = generateDeclarations(typeDecSet.typedQueries);
   
   return content;
 }
