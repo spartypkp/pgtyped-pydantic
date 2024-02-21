@@ -251,7 +251,7 @@ export async function queryToPydanticDeclarations(
 		);
 	} else {
 		returnTypesModel += generateTypeAlias(resultModelName, 'None');
-		resultModelName = 'None';
+		
 	}
 
 
@@ -270,15 +270,8 @@ export async function queryToPydanticDeclarations(
 	}
 
 
-	const typePairInterface =
-		`    """ '${queryName}' query type """\n` +
-		generateModel(`${interfacePrefix}${modelName}Query`, [
-			{ fieldName: 'params', fieldType: paramModelName },
-			{ fieldName: 'result', fieldType: resultModelName },
-		]);
 
-
-	return [paramTypesModel, returnTypesModel, typePairInterface].join(
+	return [paramTypesModel, returnTypesModel].join(
 		'',
 	);
 }
@@ -387,7 +380,7 @@ export async function generateTypedecsFromFile(
 				mode: 'ts' as const,
 				fileName,
 				query: {
-					name: tsQueryAST.name,
+					name: pascalCase(tsQueryAST.name),
 					ast: tsQueryAST,
 					queryTypeAlias: `${interfacePrefix}${pascalCase(
 						tsQueryAST.name,
@@ -423,6 +416,19 @@ class ${typedQuery.query.name}:
 
 ${pydanticModel}
 
+    def run(self, params: ${typedQuery.query.paramTypeAlias}) -> List[${typedQuery.query.returnTypeAlias}]:
+        """ 
+        Method to run the sql query.
+        """
+        return []
+
+### EOF ###`;
+		pydanticModels += python_class_structure;
+	}
+	return pydanticModels;
+}
+
+/*
 	@property
 	def params(self) -> ${typedQuery.query.paramTypeAlias}:
 		"""
@@ -433,25 +439,13 @@ ${pydanticModel}
 
 
 	@property
-		def returns(self) -> ${typedQuery.query.returnTypeAlias}:
+	def returns(self) -> ${typedQuery.query.returnTypeAlias}:
 		"""
 		Propery for accessing the return type of the SQL invocation.
 		"""
 		return ${typedQuery.query.returnTypeAlias}
 
-
-	def run(self, params: ${typedQuery.query.paramTypeAlias}) -> List[${typedQuery.query.returnTypeAlias}]:
-		""" 
-		Method to run the sql query.
-		"""
-		return []
-
-### EOF ###`;
-		pydanticModels += python_class_structure;
-	}
-	return pydanticModels;
-}
-
+*/
 
 export function generateDeclarationFile(typeDecSet: TypeDeclarationSet) {
 	// file paths in generated files must be stable across platforms
