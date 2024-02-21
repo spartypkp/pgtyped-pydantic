@@ -5,7 +5,6 @@ import path from 'path';
 import { ParsedConfig, TSTypedSQLTagTransformConfig } from './config.js';
 import {
   generateDeclarations,
-  genTypedSQLOverloadFunctions,
   TSTypedQuery,
   TypeDeclarationSet,
 } from './generator.js';
@@ -147,10 +146,7 @@ export class TypedSqlTagTransformer {
         typeDecSet.typeDefinitions,
       );
       queryTypes += generateDeclarations(typeDecSet.typedQueries);
-      typedSQLOverloadFns += genTypedSQLOverloadFunctions(
-        this.transform.functionName,
-        typeDecSet.typedQueries as TSTypedQuery[],
-      );
+      typedSQLOverloadFns += "";
     }
 
     let content = this.contentStart;

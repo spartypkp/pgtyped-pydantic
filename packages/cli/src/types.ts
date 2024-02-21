@@ -44,10 +44,10 @@ const FloatOrString: Type = {
   definition: 'Union[float, str]',
 };
 const Boolean: Type = { name: 'bool' };
-const Date: Type = { name: 'datetime' }; // Assuming you want to use datetime from Python's datetime module
+const Date: Type = { name: 'datetime.datetime' }; // Assuming you want to use datetime from Python's datetime module
 const DateOrString: Type = {
-  name: 'Union[datetime, str]',
-  definition: 'Union[datetime, str]',
+  name: 'Union[datetime.datetime, str]',
+  definition: 'Union[datetime.datetime, str]',
 };
 const Bytes: Type = { name: 'bytes' };
 const Void: Type = { name: 'None' };

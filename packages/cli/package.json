@@ -1,6 +1,6 @@
 {
   "name": "@pgtyped-pydantic/cli",
-  "version": "1.0.14",
+  "version": "1.0.23",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

@@ -114,7 +114,7 @@ export async function processFile({
   if (typeDecSet.typedQueries.length > 0) {
     //console.log("Checking if oldDeclarationFileContents !== declarationFileContents")
     const declarationFileContents = await generateDeclarationFile(typeDecSet);
-    console.log("declarationFileContents in worker.ts:", declarationFileContents)
+    //console.log("declarationFileContents in worker.ts:", declarationFileContents)
     
     //console.log(declarationFileContents)
     // Get the declaration filename without suffix, and add _models.py
