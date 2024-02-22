@@ -33,8 +33,9 @@ export interface IField {
 	comment?: string;
 }
 
-const interfaceGen = (modelName: string, contents: string) =>
+const interfaceGen = (modelName: string, docstring:string, contents: string) =>
 	`    class ${modelName}(BaseModel):
+        \"\"\"${docstring}\"\"\"
 ${contents}
 \n\n`;
 
@@ -50,7 +51,7 @@ export function escapeKey(key: string) {
 	return `"${key}"`;
 }
 
-export const generateModel = (modelName: string, fields: IField[]) => {
+export const generateModel = (modelName: string, docstring: string, fields: IField[]) => {
 	const sortedFields = fields
 		.slice()
 		.sort((a, b) => a.fieldName.localeCompare(b.fieldName));
@@ -70,12 +71,18 @@ export const generateModel = (modelName: string, fields: IField[]) => {
 		})
 		.filter(Boolean)
 		.join('\n');
-	return interfaceGen(modelName, contents);
-};
+    let output = '';
+    if (contents.trim() === '') {
+        output = interfaceGen(modelName, docstring, `        pass # Looking for better ways to handle None, hmu\n`);
+    } else {
+        output = interfaceGen(modelName, docstring, contents);
+    }
+	return output;
+}
 // Converted to use Python typing modules' NewType
 export const generateTypeAlias = (typeName: string, alias: string) => {
 
-	return `    class ${typeName}(BaseModel):\n\n`;
+	return `    class ${typeName}(BaseModel):\n        pass\n`;
 
 };
 
@@ -245,27 +252,15 @@ export async function queryToPydanticDeclarations(
 
 
 	let resultModelName = `${interfacePrefix}${modelName}Result`;
-	let returnTypesModel = `    """ '${modelName}' return type """\n`;
-
+	const returnDocstring = `    """ '${modelName}' return type """\n`;
+    const returnTypesModel = generateModel(resultModelName, returnDocstring, returnFieldTypes);
 	
-    returnTypesModel += generateModel(
-        `${interfacePrefix}${modelName}Result`,
-        returnFieldTypes,
-    );
-	
-
-
-
-
+   
 
 	let paramModelName = `${interfacePrefix}${modelName}Params`;
-	let paramTypesModel = `    """ '${modelName}' parameters type """\n`;
+	let docstring = `    """ '${modelName}' parameters type """\n`;
 
-	
-    paramTypesModel += generateModel(
-        `${interfacePrefix}${modelName}Params`,
-        paramFieldTypes,
-    );
+    const paramTypesModel = generateModel(paramModelName, docstring, paramFieldTypes);
 	
 
     let params_func = `    def params(self`;
