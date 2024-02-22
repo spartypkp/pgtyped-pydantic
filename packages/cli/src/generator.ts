@@ -124,12 +124,12 @@ export async function queryToPydanticDeclarations(
 			console.error('Error in query. Details: %o', typeData);
 			if (config.failOnError) {
 				throw new Error(
-					`Query "${queryName}" is invalid. Can't generate models.`,
+					`Query "${modelName}" is invalid. Can't generate models.`,
 				);
 			}
 		} else {
 			console.error(
-				`Query '${queryName}' is invalid. Query contains an anonymous column. Consider giving the column an explicit name.`,
+				`Query '${modelName}' is invalid. Query contains an anonymous column. Consider giving the column an explicit name.`,
 			);
 		}
 		let explanation = '';
@@ -145,8 +145,8 @@ export async function queryToPydanticDeclarations(
 			`${modelName}Params`,
 			'Any',
 		);
-		const resultErrorComment = `# Query '${queryName}' is invalid, so its result is assigned type 'Any'.\n * ${explanation} */\n`;
-		const paramErrorComment = `# Query '${queryName}' is invalid, so its parameters are assigned type 'Any'.\n * ${explanation} */\n`;
+		const resultErrorComment = `# Query '${modelName}' is invalid, so its result is assigned type 'Any'.\n * ${explanation} */\n`;
+		const paramErrorComment = `# Query '${modelName}' is invalid, so its parameters are assigned type 'Any'.\n * ${explanation} */\n`;
 		return `${resultErrorComment}${returnModel}${paramErrorComment}${paramModel}`;
 	}
 
@@ -239,10 +239,13 @@ export async function queryToPydanticDeclarations(
 	// tslint:disable-next-line:no-console
 	types.errors.forEach((err) => console.log(err));
 
+    // 
+    
+
 
 
 	let resultModelName = `${interfacePrefix}${modelName}Result`;
-	let returnTypesModel = `    """ '${queryName}' return type """\n`;
+	let returnTypesModel = `    """ '${modelName}' return type """\n`;
 
 	if (returnFieldTypes.length > 0) {
 		returnTypesModel += generateModel(
@@ -256,8 +259,10 @@ export async function queryToPydanticDeclarations(
 
 
 
+
+
 	let paramModelName = `${interfacePrefix}${modelName}Params`;
-	let paramTypesModel = `    """ '${queryName}' parameters type """\n`;
+	let paramTypesModel = `    """ '${modelName}' parameters type """\n`;
 
 	if (paramFieldTypes.length > 0) {
 		paramTypesModel += generateModel(
@@ -269,9 +274,24 @@ export async function queryToPydanticDeclarations(
 		paramModelName = 'None';
 	}
 
+    let params_func = `    def params(self`;
+    let init_msg = '';
+    for (const param of paramFieldTypes) {
+        params_func += `, ${param.fieldName}: ${param.fieldType}`;
+        init_msg += `${param.fieldName} = ${param.fieldName}, `;
+    }
+    if (init_msg !== '') {
+        init_msg = init_msg.slice(0, -2);
+    }
+    // Remove the last comma
+    if (params_func[params_func.length - 1] === ',') {
+        params_func = params_func.slice(0, -1);
+    }
+    params_func += `) -> ${modelName}Params:\n        """\n    Method to set the parameters of the SQL invocation.\n        """\n        return self.${modelName}Params(${init_msg})\n\n`;
 
 
-	return [paramTypesModel, returnTypesModel].join(
+
+	return [paramTypesModel, returnTypesModel, params_func].join(
 		'',
 	);
 }
@@ -351,7 +371,7 @@ export async function generateTypedecsFromFile(
 			typedQuery = {
 				mode: 'sql' as const,
 				query: {
-					name: camelCase(sqlQueryAST.name),
+					name: pascalCase(sqlQueryAST.name),
 					ast: sqlQueryAST,
 					ir: queryASTToIR(sqlQueryAST),
 					paramTypeAlias: `${interfacePrefix}${pascalCase(
@@ -406,7 +426,7 @@ export function generateDeclarations(typedQueries: TypedQuery[]): string {
 		const sqlQuery = typedQuery.query.ir.statement;
 
 		let python_class_structure = `
-class ${typedQuery.query.name}:
+class ${pascalCase(typedQuery.query.name)}:
     """ 
     Class to hold all pydantic models for a single SQL query.
 	Defined by SQL invocation in ${pythonFilename}.
@@ -416,11 +436,14 @@ class ${typedQuery.query.name}:
 
 ${pydanticModel}
 
-    def run(self, params: ${typedQuery.query.paramTypeAlias}) -> List[${typedQuery.query.returnTypeAlias}]:
+    def run(self, params: ${typedQuery.query.paramTypeAlias}, connection: psycopg.Connection) -> List[${typedQuery.query.returnTypeAlias}]:
         """ 
         Method to run the sql query.
         """
-        return []
+        connection.row_factory = class_row(${typedQuery.query.returnTypeAlias})
+        rows: List[${typedQuery.query.returnTypeAlias}] = sql_executor(sql_query_with_placeholders=${sqlQuery}, parameters_in_pydantic_class=params, connection=connection)
+        return rows
+
 
 ### EOF ###`;
 		pydanticModels += python_class_structure;
