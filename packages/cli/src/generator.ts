@@ -34,7 +34,7 @@ export interface IField {
 }
 
 const interfaceGen = (modelName: string, contents: string) =>
-	`    class ${modelName} (BaseModel):
+	`    class ${modelName}(BaseModel):
 ${contents}
 \n\n`;
 
@@ -75,7 +75,7 @@ export const generateModel = (modelName: string, fields: IField[]) => {
 // Converted to use Python typing modules' NewType
 export const generateTypeAlias = (typeName: string, alias: string) => {
 
-	return `    ${typeName} = NewType('${typeName}', ${alias})\n\n`;
+	return `    class ${typeName}(BaseModel):\n\n`;
 
 };
 
@@ -247,15 +247,12 @@ export async function queryToPydanticDeclarations(
 	let resultModelName = `${interfacePrefix}${modelName}Result`;
 	let returnTypesModel = `    """ '${modelName}' return type """\n`;
 
-	if (returnFieldTypes.length > 0) {
-		returnTypesModel += generateModel(
-			`${interfacePrefix}${modelName}Result`,
-			returnFieldTypes,
-		);
-	} else {
-		returnTypesModel += generateTypeAlias(resultModelName, 'None');
-		
-	}
+	
+    returnTypesModel += generateModel(
+        `${interfacePrefix}${modelName}Result`,
+        returnFieldTypes,
+    );
+	
 
 
 
@@ -264,15 +261,12 @@ export async function queryToPydanticDeclarations(
 	let paramModelName = `${interfacePrefix}${modelName}Params`;
 	let paramTypesModel = `    """ '${modelName}' parameters type """\n`;
 
-	if (paramFieldTypes.length > 0) {
-		paramTypesModel += generateModel(
-			`${interfacePrefix}${modelName}Params`,
-			paramFieldTypes,
-		);
-	} else {
-		paramTypesModel += generateTypeAlias(paramModelName, 'None');
-		paramModelName = 'None';
-	}
+	
+    paramTypesModel += generateModel(
+        `${interfacePrefix}${modelName}Params`,
+        paramFieldTypes,
+    );
+	
 
     let params_func = `    def params(self`;
     let init_msg = '';
@@ -430,9 +424,11 @@ class ${pascalCase(typedQuery.query.name)}:
     """ 
     Class to hold all pydantic models for a single SQL query.
 	Defined by SQL invocation in ${pythonFilename}.
-	Original SQL: "${sqlQuery}"
 	Used in files: []
 	"""
+
+    def __init__(self):
+        self.sql_string = """${sqlQuery}"""
 
 ${pydanticModel}
 
@@ -440,9 +436,10 @@ ${pydanticModel}
         """ 
         Method to run the sql query.
         """
-        connection.row_factory = class_row(${typedQuery.query.returnTypeAlias})
-        rows: List[${typedQuery.query.returnTypeAlias}] = sql_executor(sql_query_with_placeholders=${sqlQuery}, parameters_in_pydantic_class=params, connection=connection)
+        connection.row_factory = class_row(self.${typedQuery.query.returnTypeAlias})
+        rows: List[self.${typedQuery.query.returnTypeAlias}] = sql_executor(sql_query_with_placeholders=self.sql_string, parameters_in_pydantic_class=params, connection=connection)
         return rows
+    
 
 
 ### EOF ###`;
