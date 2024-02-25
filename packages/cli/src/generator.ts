@@ -35,7 +35,7 @@ export interface IField {
 
 const interfaceGen = (modelName: string, docstring:string, contents: string) =>
 	`    class ${modelName}(BaseModel):
-        \"\"\"${docstring}\"\"\"
+        \"\"\"${docstring}\"\"\"\n
 ${contents}
 \n\n`;
 
@@ -239,7 +239,7 @@ export async function queryToPydanticDeclarations(
 			}
 
 
-            let pydanticParam = generateModel(fieldType, `    """ '${param.name}' Custom Param type """\n`, pydanticFields);
+            let pydanticParam = generateModel(fieldType, `'${param.name}' Custom Param type`, pydanticFields);
             pydanticParams.push(pydanticParam);
 			paramFieldTypes.push({
 				fieldName: param.name,
@@ -261,13 +261,13 @@ export async function queryToPydanticDeclarations(
 
 
 	let resultModelName = `${interfacePrefix}${modelName}Result`;
-	const returnDocstring = `    """ '${modelName}' return type """\n`;
+	const returnDocstring = `'${modelName}' return type `;
     const returnTypesModel = generateModel(resultModelName, returnDocstring, returnFieldTypes);
 	
    
 
 	let paramModelName = `${interfacePrefix}${modelName}Params`;
-	let docstring = `    """ '${modelName}' parameters type """\n`;
+	let docstring = `'${modelName}' parameters type`;
 
     const paramTypesModel = generateModel(paramModelName, docstring, paramFieldTypes);
 	
