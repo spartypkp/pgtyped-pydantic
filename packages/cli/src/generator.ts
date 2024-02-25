@@ -189,6 +189,7 @@ export async function queryToPydanticDeclarations(
 	});
 
 	const { params } = paramMetadata;
+    const pydanticParams = [];
 	for (const param of paramMetadata.mapping) {
 		if (
 			param.type === ParameterTransform.Scalar ||
@@ -218,27 +219,35 @@ export async function queryToPydanticDeclarations(
 			});
 		} else {
 			const isArray = param.type === ParameterTransform.PickSpread;
-			let fieldType = Object.values(param.dict)
-				.map((p) => {
-					const paramType = types.use(
-						params[p.assignedIndex - 1],
-						TypeScope.Parameter,
-					);
-					return p.required
-						? `        ${p.name}: ${paramType}`
-						: `        ${p.name}: Optional[${paramType}]`;
-				})
-				.join(',\n');
-			fieldType = `\n${fieldType}\n  `;
+			let fieldType = pascalCase(param.name);
+            
+            let pydanticFields: IField[] = Object.values(param.dict)
+            .map((p) => {
+                const paramType = types.use(
+                    params[p.assignedIndex - 1],
+                    TypeScope.Parameter,
+                );
+                return {
+                    fieldName: p.name,
+                    fieldType: paramType,
+                    required: p.required
+                };
+            });
+
 			if (isArray) {
 				fieldType = `List[${fieldType}]`;
 			}
+
+
+            let pydanticParam = generateModel(fieldType, `    """ '${param.name}' Custom Param type """\n`, pydanticFields);
+            pydanticParams.push(pydanticParam);
 			paramFieldTypes.push({
 				fieldName: param.name,
 				fieldType,
 			});
 		}
 	}
+    const customPydanticParams = pydanticParams.join('\n');
 
 	// TypeAllocator errors are currently considered non-fatal since a `never`
 	// type is emitted which can be caught later when compiling the generated
@@ -280,13 +289,10 @@ export async function queryToPydanticDeclarations(
 
 
 
-	return [paramTypesModel, returnTypesModel, params_func].join(
+	return [customPydanticParams, paramTypesModel, returnTypesModel, params_func].join(
 		'',
 	);
 }
-
-
-
 
 
 export type TSTypedQuery = {
