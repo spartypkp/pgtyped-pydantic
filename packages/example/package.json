@@ -22,7 +22,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@pgtyped-pydantic/cli": "^1.1.15",
+    "@pgtyped-pydantic/cli": "^1.1.16",
     "@pgtyped-pydantic/query": "^1.0.0",
     "expect": "29.7.0",
     "pg": "8.11.3",

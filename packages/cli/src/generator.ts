@@ -221,33 +221,21 @@ export async function queryToPydanticDeclarations(
 			const isArray = param.type === ParameterTransform.PickSpread;
 			let fieldType = pascalCase(param.name);
             
-            let pydanticFields: IField[] = Object.values(param.dict)
-            .map((p) => {
-                const paramType = types.use(
-                    params[p.assignedIndex - 1],
-                    TypeScope.Parameter,
-                );
-                return {
-                    fieldName: p.name,
-                    fieldType: paramType,
-                    required: p.required
-                };
-            });
-
+            
+            fieldType = fieldType;
 			if (isArray) {
 				fieldType = `List[${fieldType}]`;
 			}
 
 
-            let pydanticParam = generateModel(fieldType, `'${param.name}' Custom Param type`, pydanticFields);
-            pydanticParams.push(pydanticParam);
+            
 			paramFieldTypes.push({
 				fieldName: param.name,
 				fieldType,
 			});
 		}
 	}
-    const customPydanticParams = pydanticParams.join('\n');
+    
 
 	// TypeAllocator errors are currently considered non-fatal since a `never`
 	// type is emitted which can be caught later when compiling the generated
@@ -289,7 +277,7 @@ export async function queryToPydanticDeclarations(
 
 
 
-	return [customPydanticParams, paramTypesModel, returnTypesModel, params_func].join(
+	return [paramTypesModel, returnTypesModel, params_func].join(
 		'',
 	);
 }
