@@ -26,6 +26,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "bin": {
+    "process": "./lib/processPythonQuery.js"
+  },
   "scripts": {
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "build:cjs": "esbuild --bundle --sourcemap --platform=node --target=node14 src/index.ts --minify --external:chalk --external:antlr4ts --outfile=lib/index.cjs",

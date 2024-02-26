@@ -20,6 +20,7 @@ import { ParsedConfig, TransformConfig } from './config.js';
 import { parseCode as parseTypescriptFile } from './parseTypescript.js';
 import { TypeAllocator, TypeDefinitions, TypeScope } from './types.js';
 import { IQueryTypes } from '@pgtyped-pydantic/query/lib/actions.js';
+import { ParseEvent, parseTSQuery } from '@pgtyped-pydantic/parser';
 
 export enum ProcessingMode {
 	SQL = 'sql-file',
@@ -113,6 +114,8 @@ export async function queryToPydanticDeclarations(
 		queryName = pascalCase(parsedQuery.ast.name);
 		queryData = processSQLQueryIR(queryASTToIR(parsedQuery.ast));
 	}
+    //console.log(queryData);
+    
 
 	const typeData = await typeSource(queryData);
 	const modelName = pascalCase(queryName);
@@ -405,6 +408,9 @@ export function generateDeclarations(typedQueries: TypedQuery[]): string {
 		if (typedQuery.mode === 'ts') {
 			continue;
 		}
+        
+        
+
 		const pythonFilename = typedQuery.fileName.replace("_temp.sql", ".py");
 		const sqlQuery = typedQuery.query.ir.statement;
 
@@ -424,6 +430,9 @@ ${pydanticModel}
         self.resultType = self.${typedQuery.query.returnTypeAlias}
         self.definition_file = "${pythonFilename}" # This is the file where the class is defined
         self.definition_mode = "sql" # Only sql is supported for now
+        self.query_ir = """${typedQuery.query.ir}"""
+        self.query_ast = """${typedQuery.query.ast}"""
+
 
     def run(self, params: ${typedQuery.query.paramTypeAlias}, connection: psycopg.Connection) -> List[${typedQuery.query.returnTypeAlias}]:
         """ 
