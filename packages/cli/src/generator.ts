@@ -412,14 +412,18 @@ export function generateDeclarations(typedQueries: TypedQuery[]): string {
 class ${pascalCase(typedQuery.query.name)}:
     """ 
     Class to hold all pydantic models for a single SQL query.
-	Defined by SQL invocation in ${pythonFilename}.
-	Used in files: []
+	Please suggest more useful class methods and properties.
 	"""
 
-    def __init__(self):
-        self.sql_string = """${sqlQuery}"""
 
 ${pydanticModel}
+
+    def __init__(self):
+        self.sql_string = """${sqlQuery}""" 
+        self.paramType = self.${typedQuery.query.paramTypeAlias}
+        self.resultType = self.${typedQuery.query.returnTypeAlias}
+        self.definition_file = "${pythonFilename}" # This is the file where the class is defined
+        self.definition_mode = "sql" # Only sql is supported for now
 
     def run(self, params: ${typedQuery.query.paramTypeAlias}, connection: psycopg.Connection) -> List[${typedQuery.query.returnTypeAlias}]:
         """ 
